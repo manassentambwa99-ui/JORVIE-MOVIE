@@ -6,7 +6,7 @@
     <title>JORVIE MOVIE</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e50914">
-    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/747/747310.png">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #141414; color: #fff; padding-bottom: 40px; user-select: none; }
@@ -30,11 +30,11 @@
             border-radius: 16px;
             font-size: 12px;
             outline: none;
-            width: 130px;
+            width: 140px;
         }
 
         .hero {
-            height: 260px;
+            height: 250px;
             background: linear-gradient(0deg, #141414 0%, rgba(0,0,0,0.4) 100%), url('https://image.tmdb.org/t/p/w780/m990d0M58R7E4mKkS2G0u01l3b1.jpg') center/cover no-repeat;
             display: flex;
             flex-direction: column;
@@ -94,15 +94,8 @@
             background: #111;
         }
         .player-title { font-size: 13px; font-weight: bold; color: #fff; }
-        .close-btn {
-            background: #e50914;
-            color: #fff;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 14px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .server-select { background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; font-size: 11px; border-radius: 4px; }
+        .close-btn { background: #e50914; color: #fff; border: none; padding: 5px 12px; border-radius: 14px; font-weight: bold; cursor: pointer; }
         .iframe-container { width: 100%; height: calc(100% - 45px); flex-grow: 1; }
         iframe { width: 100%; height: 100%; border: none; }
     </style>
@@ -112,7 +105,7 @@
     <nav>
         <div class="logo">JORVIE MOVIE</div>
         <div class="search-box">
-            <input type="text" placeholder="Rechercher (VF)..." onkeypress="handleSearch(event)">
+            <input type="text" placeholder="Recherche VF..." onkeypress="handleSearch(event)">
         </div>
     </nav>
 
@@ -122,10 +115,15 @@
         <button class="btn-play" onclick="playMedia('tv', '213713', 'Solo Leveling (VF)')">▶ REGARDER</button>
     </div>
 
-    <!-- Modale de Lecture -->
+    <!-- Modale de Lecteur Lecteur Multi-Serveur -->
     <div id="player-modal">
         <div class="player-header">
             <span class="player-title" id="playing-title">Lecture</span>
+            <select class="server-select" id="serverSelect" onchange="changeServer()">
+                <option value="1">Serveur VF 1</option>
+                <option value="2">Serveur VF 2</option>
+                <option value="3">Serveur VF 3</option>
+            </select>
             <button class="close-btn" onclick="closePlayer()">✕ Fermer</button>
         </div>
         <div class="iframe-container">
@@ -133,7 +131,7 @@
         </div>
     </div>
 
-    <!-- Contenus Séparés -->
+    <!-- Catalogues -->
     <div class="section">
         <div class="section-title">🔥 Animés Populaires (VF)</div>
         <div class="row" id="anime-row"></div>
@@ -150,24 +148,30 @@
     </div>
 
     <script>
-        // Catalogues propres et distincts avec images stables (CDN direct)
+        let currentMedia = { type: '', id: '' };
+
+        // Catalogues complets avec posters hébergés directement sur TMDB
         const animeData = [
-            { id: '213713', title: 'Solo Leveling', img: 'https://images.justwatch.com/poster/310938637/s166/solo-leveling.webp', type: 'tv' },
-            { id: '94605', title: 'Arcane', img: 'https://images.justwatch.com/poster/258284564/s166/arcane.webp', type: 'tv' },
-            { id: '85937', title: 'Demon Slayer', img: 'https://images.justwatch.com/poster/151280385/s166/demon-slayer.webp', type: 'tv' },
-            { id: '37854', title: 'One Piece', img: 'https://images.justwatch.com/poster/128610787/s166/one-piece.webp', type: 'tv' }
+            { id: '213713', title: 'Solo Leveling', img: 'https://image.tmdb.org/t/p/w300/1p55S2L6O39A1uO7q3A5aI6n8A.jpg', type: 'tv' },
+            { id: '94605', title: 'Arcane', img: 'https://image.tmdb.org/t/p/w300/fqld221f2A332612.jpg', type: 'tv' },
+            { id: '85937', title: 'Demon Slayer', img: 'https://image.tmdb.org/t/p/w300/xA2351253.jpg', type: 'tv' },
+            { id: '37854', title: 'One Piece', img: 'https://image.tmdb.org/t/p/w300/cMD9Y21RAnR33P9R3S331aC2.jpg', type: 'tv' },
+            { id: '1429', title: 'Attack on Titan', img: 'https://image.tmdb.org/t/p/w300/aiB3332152a512.jpg', type: 'tv' },
+            { id: '60572', title: 'Dragon Ball Super', img: 'https://image.tmdb.org/t/p/w300/1111aA3S3.jpg', type: 'tv' }
         ];
 
         const movieData = [
-            { id: '296096', title: 'Dernier Train pour Busan', img: 'https://images.justwatch.com/poster/240890691/s166/dernier-train-pour-busan.webp', type: 'movie' },
-            { id: '496243', title: 'Parasite', img: 'https://images.justwatch.com/poster/155609424/s166/parasite.webp', type: 'movie' },
-            { id: '1259', title: 'The Host', img: 'https://images.justwatch.com/poster/11101962/s166/the-host.webp', type: 'movie' }
+            { id: '296096', title: 'Dernier Train pour Busan', img: 'https://image.tmdb.org/t/p/w300/223S35123512.jpg', type: 'movie' },
+            { id: '496243', title: 'Parasite', img: 'https://image.tmdb.org/t/p/w300/7IiT21235123.jpg', type: 'movie' },
+            { id: '1259', title: 'The Host', img: 'https://image.tmdb.org/t/p/w300/a351235123.jpg', type: 'movie' },
+            { id: '530915', title: 'The Call', img: 'https://image.tmdb.org/t/p/w300/35123512a.jpg', type: 'movie' }
         ];
 
         const dramaData = [
-            { id: '93405', title: 'Squid Game', img: 'https://images.justwatch.com/poster/251390487/s166/squid-game.webp', type: 'tv' },
-            { id: '118320', title: 'All of Us Are Dead', img: 'https://images.justwatch.com/poster/260787498/s166/all-of-us-are-dead.webp', type: 'tv' },
-            { id: '67075', title: 'Goblin', img: 'https://images.justwatch.com/poster/17540203/s166/goblin.webp', type: 'tv' }
+            { id: '93405', title: 'Squid Game', img: 'https://image.tmdb.org/t/p/w300/dA35123512.jpg', type: 'tv' },
+            { id: '118320', title: 'All of Us Are Dead', img: 'https://image.tmdb.org/t/p/w300/a351235.jpg', type: 'tv' },
+            { id: '67075', title: 'Goblin', img: 'https://image.tmdb.org/t/p/w300/a3512351235.jpg', type: 'tv' },
+            { id: '117376', title: 'Vincenzo', img: 'https://image.tmdb.org/t/p/w300/a3512351231.jpg', type: 'tv' }
         ];
 
         function renderCategory(list, containerId) {
@@ -178,7 +182,7 @@
                 card.className = 'card';
                 card.onclick = () => playMedia(item.type, item.id, item.title);
                 card.innerHTML = `
-                    <img src="${item.img}" alt="${item.title}">
+                    <img src="${item.img}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/110x155?text=${encodeURIComponent(item.title)}'">
                     <div class="card-title">${item.title}</div>
                 `;
                 container.appendChild(card);
@@ -186,10 +190,29 @@
         }
 
         function playMedia(type, id, title) {
+            currentMedia = { type, id };
             document.getElementById('playing-title').innerText = title;
-            const iframe = document.getElementById('video-iframe');
-            iframe.src = `https://vidsrc.me/embed/${type}?tmdb=${id}&lang=fr`;
+            document.getElementById('serverSelect').value = "1";
+            loadServer(1);
             document.getElementById('player-modal').style.display = 'flex';
+        }
+
+        function loadServer(serverNum) {
+            const iframe = document.getElementById('video-iframe');
+            const { type, id } = currentMedia;
+
+            if (serverNum == 1) {
+                iframe.src = `https://vidsrc.to/embed/${type}/${id}`;
+            } else if (serverNum == 2) {
+                iframe.src = `https://2embed.org/embed/${type}?tmdb=${id}&ds_lang=fr`;
+            } else {
+                iframe.src = `https://embed.su/embed/${type}/${id}`;
+            }
+        }
+
+        function changeServer() {
+            const serverNum = document.getElementById('serverSelect').value;
+            loadServer(serverNum);
         }
 
         function closePlayer() {
@@ -198,8 +221,9 @@
             document.getElementById('player-modal').style.display = 'none';
         }
 
+        // Enregistrement du Service Worker pour permettre l'installation PWA
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
         }
 
         window.onload = () => {
