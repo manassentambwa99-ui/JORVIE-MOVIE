@@ -12,12 +12,12 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #121212; color: #ffffff; padding-bottom: 50px; user-select: none; }
 
-        /* Navigation */
+        /* Barre de Navigation */
         nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 18px;
+            padding: 12px 16px;
             background: rgba(18, 18, 18, 0.95);
             backdrop-filter: blur(10px);
             position: sticky;
@@ -26,81 +26,76 @@
             border-bottom: 1px solid #222;
         }
         .nav-left { display: flex; align-items: center; gap: 8px; }
-        .nav-logo-img { width: 26px; height: 26px; object-fit: contain; }
-        .logo { font-size: 19px; font-weight: 900; color: #e50914; letter-spacing: 0.5px; }
+        .logo-icon { width: 24px; height: 24px; fill: #e50914; }
+        .logo { font-size: 18px; font-weight: 900; color: #e50914; letter-spacing: 0.5px; }
         .search-box input {
             background: #252525;
             border: 1px solid #333;
             color: #fff;
-            padding: 7px 14px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 18px;
             font-size: 12px;
             outline: none;
-            width: 140px;
+            width: 130px;
         }
 
-        /* Banner Style MovieBox */
+        /* Bannière Principale Style MovieBox */
         .hero {
             position: relative;
-            height: 300px;
-            background: linear-gradient(180deg, rgba(18,18,18,0.1) 0%, rgba(18,18,18,1) 100%), url('https://images.justwatch.com/backdrop/310938637/s1440/solo-leveling.jpg') center/cover no-repeat;
+            height: 280px;
+            background: linear-gradient(180deg, rgba(18,18,18,0.2) 0%, rgba(18,18,18,1) 100%), url('https://image.tmdb.org/t/p/w780/m990d0M58R7E4mKkS2G0u01l3b1.jpg') center/cover no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 20px;
+            padding: 18px;
         }
         .hero-badge { background: #e50914; color: #fff; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px; width: fit-content; margin-bottom: 6px; }
-        .hero h2 { font-size: 26px; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
-        .hero p { font-size: 12px; color: #aaa; margin: 4px 0 14px; max-width: 90%; }
+        .hero h2 { font-size: 24px; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
+        .hero p { font-size: 12px; color: #aaa; margin: 4px 0 12px; }
         .btn-play {
             background: #e50914;
             color: white;
             border: none;
-            padding: 10px 22px;
-            font-size: 13px;
+            padding: 9px 20px;
+            font-size: 12px;
             font-weight: bold;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
             width: fit-content;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
-        /* Sections & Grille MovieBox */
-        .section { margin-top: 24px; padding: 0 16px; }
-        .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .section-title::before { content: ''; width: 4px; height: 16px; background: #e50914; border-radius: 2px; }
+        /* Ensembles de Catégories */
+        .section { margin-top: 22px; padding: 0 14px; }
+        .section-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .section-title::before { content: ''; width: 4px; height: 15px; background: #e50914; border-radius: 2px; }
         
         .row {
             display: flex;
             overflow-x: auto;
             gap: 12px;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             scrollbar-width: none;
         }
         .row::-webkit-scrollbar { display: none; }
 
         .card {
-            min-width: 120px;
-            width: 120px;
+            min-width: 115px;
+            width: 115px;
             background: #1c1c1c;
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
             flex-shrink: 0;
             cursor: pointer;
             position: relative;
-            transition: transform 0.2s ease;
         }
-        .card:active { transform: scale(0.96); }
-        .card img { width: 100%; height: 170px; object-fit: cover; display: block; background: #2a2a2a; }
-        .card-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.7); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 3px; backdrop-filter: blur(4px); }
-        .card-info { padding: 8px 6px; }
-        .card-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-        .card-sub { font-size: 10px; color: #888; margin-top: 2px; }
+        .card img { width: 100%; height: 165px; object-fit: cover; display: block; background: #2a2a2a; }
+        .card-tag { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.75); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 3px; }
+        .card-info { padding: 6px; }
+        .card-title { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .card-sub { font-size: 9px; color: #888; margin-top: 2px; }
 
-        /* Lecteur Vidéo Local / Popup */
+        /* Lecteur Vidéo Interne (Sans Publicité) */
         #player-modal {
             display: none;
             position: fixed;
@@ -117,13 +112,13 @@
             background: #181818;
             border-bottom: 1px solid #282828;
         }
-        .player-title { font-size: 14px; font-weight: bold; color: #fff; }
+        .player-title { font-size: 13px; font-weight: bold; color: #fff; }
         .close-btn {
-            background: #282828;
+            background: #e50914;
             color: #fff;
             border: none;
             padding: 6px 14px;
-            border-radius: 20px;
+            border-radius: 16px;
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
@@ -143,7 +138,7 @@
 
     <nav>
         <div class="nav-left">
-            <img src="logo.svg" alt="Logo" class="nav-logo-img" onerror="this.style.display='none'">
+            <svg class="logo-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4h-2l2 4h-3l-2-4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
             <div class="logo">JORVIE MOVIE</div>
         </div>
         <div class="search-box">
@@ -152,15 +147,15 @@
     </nav>
 
     <div class="hero">
-        <span class="hero-badge">VF • TENDANCE</span>
+        <span class="hero-badge">VF • POPULAIRE</span>
         <h2>Solo Leveling</h2>
-        <p>Série d'action et de fantasy épique (Saison 1 complète en Français).</p>
+        <p>Série d'action et de fantasy (Épisodes complets en Français).</p>
         <button class="btn-play" onclick="playVideo('Solo Leveling (VF)', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
-            ▶ REGARDER MAINTENANT
+            ▶ REGARDER
         </button>
     </div>
 
-    <!-- Lecteur Vidéo Direct Local -->
+    <!-- Modale du lecteur vidéo 100% local -->
     <div id="player-modal">
         <div class="player-header">
             <span class="player-title" id="playing-title">Lecture vidéo</span>
@@ -169,12 +164,11 @@
         <div class="video-container">
             <video id="local-video-player" controls controlsList="nodownload" playsinline autoplay>
                 <source id="video-source" src="" type="video/mp4">
-                Votre navigateur ne supporte pas la lecture de cette vidéo.
             </video>
         </div>
     </div>
 
-    <!-- Catégories de contenus VF -->
+    <!-- Contenus -->
     <div class="section">
         <div class="section-title">🔥 Animés (VF)</div>
         <div class="row" id="anime-row"></div>
@@ -191,24 +185,26 @@
     </div>
 
     <script>
-        // Catalogue avec images fiables et vidéos MP4 directes en Français / VF
-        const animeData = [
-            { title: 'Solo Leveling', sub: 'Épisode 1 • VF', tag: 'VF', img: 'https://images.justwatch.com/poster/310938637/s166/solo-leveling.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
-            { title: 'Demon Slayer', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://images.justwatch.com/poster/151280385/s166/demon-slayer.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
-            { title: 'Arcane', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://images.justwatch.com/poster/258284564/s166/arcane.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
-            { title: 'One Piece', sub: 'Arc Wano • VF', tag: 'VF', img: 'https://images.justwatch.com/poster/128610787/s166/one-piece.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' }
+        const TMDB_KEY = '826b0a5b2d96ab0bc15303a5e1d0757c';
+
+        // Catalogues complets avec liens vidéo locaux MP4 et images de secours
+        const animeCatalog = [
+            { id: '213713', title: 'Solo Leveling', sub: 'Épisode 1 • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w300/1p55S2L6O39A1uO7q3A5aI6n8A.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
+            { id: '85937', title: 'Demon Slayer', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w300/xA2351253.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
+            { id: '94605', title: 'Arcane', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w300/fqld221f2A332612.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
+            { id: '37854', title: 'One Piece', sub: 'Arc Wano • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w300/cMD9Y21RAnR33P9R3S331aC2.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' }
         ];
 
-        const movieData = [
-            { title: 'Dernier Train pour Busan', sub: 'Film Complet • VF', tag: 'VF HD', img: 'https://images.justwatch.com/poster/240890691/s166/dernier-train-pour-busan.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
-            { title: 'Parasite', sub: 'Film Complet • VF', tag: 'VF HD', img: 'https://images.justwatch.com/poster/155609424/s166/parasite.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' },
-            { title: 'The Host', sub: 'Film Complet • VF', tag: 'VF', img: 'https://images.justwatch.com/poster/11101962/s166/the-host.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' }
+        const movieCatalog = [
+            { id: '296096', title: 'Train to Busan', sub: 'Film • VF', tag: 'VF HD', img: 'https://image.tmdb.org/t/p/w300/223S35123512.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
+            { id: '496243', title: 'Parasite', sub: 'Film • VF', tag: 'VF HD', img: 'https://image.tmdb.org/t/p/w300/7IiT21235123.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' },
+            { id: '1259', title: 'The Host', sub: 'Film • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w300/a351235123.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' }
         ];
 
-        const dramaData = [
-            { title: 'Squid Game', sub: 'Épisode 1 • VF', tag: 'VF 4K', img: 'https://images.justwatch.com/poster/251390487/s166/squid-game.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoynies.mp4' },
-            { title: 'All of Us Are Dead', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://images.justwatch.com/poster/260787498/s166/all-of-us-are-dead.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4' },
-            { title: 'Goblin', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://images.justwatch.com/poster/17540203/s166/goblin.webp', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' }
+        const dramaCatalog = [
+            { id: '93405', title: 'Squid Game', sub: 'Saison 1 • VF', tag: 'VF 4K', img: 'https://image.tmdb.org/t/p/w300/dA35123512.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoynies.mp4' },
+            { id: '118320', title: 'All of Us Are Dead', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w300/a351235.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4' },
+            { id: '67075', title: 'Goblin', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w300/a3512351235.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' }
         ];
 
         function renderRow(list, containerId) {
@@ -218,9 +214,13 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.onclick = () => playVideo(item.title, item.video);
+                
+                // Fallback direct sur image stylisée pour éliminer les carrés sombres
+                const fallbackImage = `https://via.placeholder.com/115x165/1c1c1c/ffffff?text=${encodeURIComponent(item.title)}`;
+                
                 card.innerHTML = `
                     <span class="card-tag">${item.tag}</span>
-                    <img src="${item.img}" alt="${item.title}" loading="lazy">
+                    <img src="${item.img}" alt="${item.title}" onerror="this.onerror=null; this.src='${fallbackImage}';">
                     <div class="card-info">
                         <div class="card-title">${item.title}</div>
                         <div class="card-sub">${item.sub}</div>
@@ -249,20 +249,19 @@
         function filterCatalog() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filter = list => list.filter(item => item.title.toLowerCase().includes(query));
-            renderRow(filter(animeData), 'anime-row');
-            renderRow(filter(movieData), 'movies-row');
-            renderRow(filter(dramaData), 'dramas-row');
+            renderRow(filter(animeCatalog), 'anime-row');
+            renderRow(filter(movieCatalog), 'movies-row');
+            renderRow(filter(dramaCatalog), 'dramas-row');
         }
 
-        // Enregistrement PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
         window.onload = () => {
-            renderRow(animeData, 'anime-row');
-            renderRow(movieData, 'movies-row');
-            renderRow(dramaData, 'dramas-row');
+            renderRow(animeCatalog, 'anime-row');
+            renderRow(movieCatalog, 'movies-row');
+            renderRow(dramaCatalog, 'dramas-row');
         };
     </script>
 </body>
