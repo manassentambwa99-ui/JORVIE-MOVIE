@@ -6,12 +6,11 @@
     <title>JORVIE MOVIE</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e50914">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/747/747310.png">
+    <link rel="apple-touch-icon" href="logo.png">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #141414; color: #fff; padding-bottom: 40px; user-select: none; }
 
-        /* Header / Navbar */
         nav {
             display: flex;
             align-items: center;
@@ -34,16 +33,15 @@
             width: 130px;
         }
 
-        /* Bannière Principale */
         .hero {
-            height: 280px;
-            background: linear-gradient(0deg, #141414 0%, rgba(0,0,0,0.3) 100%), url('https://image.tmdb.org/t/p/w780/m990d0M58R7E4mKkS2G0u01l3b1.jpg') center/cover no-repeat;
+            height: 260px;
+            background: linear-gradient(0deg, #141414 0%, rgba(0,0,0,0.4) 100%), url('https://image.tmdb.org/t/p/w780/m990d0M58R7E4mKkS2G0u01l3b1.jpg') center/cover no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             padding: 16px;
         }
-        .hero h2 { font-size: 24px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .hero h2 { font-size: 22px; font-weight: 800; }
         .hero p { font-size: 12px; color: #ccc; margin: 4px 0 10px; }
         .hero .btn-play {
             background-color: #e50914;
@@ -56,7 +54,6 @@
             width: fit-content;
         }
 
-        /* Sections & Affiches */
         .section { margin-top: 20px; padding: 0 12px; }
         .section-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; border-left: 3px solid #e50914; padding-left: 8px; }
         
@@ -81,7 +78,6 @@
         .card img { width: 100%; height: 155px; object-fit: cover; display: block; background: #2a2a2a; }
         .card-title { font-size: 11px; padding: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
 
-        /* Lecteur Vidéo Plein Écran */
         #player-modal {
             display: none;
             position: fixed;
@@ -116,7 +112,7 @@
     <nav>
         <div class="logo">JORVIE MOVIE</div>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Rechercher (VF)..." onkeypress="handleSearch(event)">
+            <input type="text" placeholder="Rechercher (VF)..." onkeypress="handleSearch(event)">
         </div>
     </nav>
 
@@ -126,7 +122,7 @@
         <button class="btn-play" onclick="playMedia('tv', '213713', 'Solo Leveling (VF)')">▶ REGARDER</button>
     </div>
 
-    <!-- Lecteur Vidéo Intégré -->
+    <!-- Modale de Lecture -->
     <div id="player-modal">
         <div class="player-header">
             <span class="player-title" id="playing-title">Lecture</span>
@@ -137,7 +133,7 @@
         </div>
     </div>
 
-    <!-- Contenus -->
+    <!-- Contenus Séparés -->
     <div class="section">
         <div class="section-title">🔥 Animés Populaires (VF)</div>
         <div class="row" id="anime-row"></div>
@@ -154,48 +150,30 @@
     </div>
 
     <script>
-        const TMDB_KEY = '826b0a5b2d96ab0bc15303a5e1d0757c';
-
-        // Données de secours stables si TMDB bloque temporairement
-        const fallbackAnime = [
-            { id: '213713', title: 'Solo Leveling', img: 'https://image.tmdb.org/t/p/w300/1p55S2L6O39A1uO7q3A5aI6n8A.jpg', type: 'tv' },
-            { id: '94605', title: 'Arcane', img: 'https://image.tmdb.org/t/p/w300/fqld221f2A332612.jpg', type: 'tv' },
-            { id: '85937', title: 'Demon Slayer', img: 'https://image.tmdb.org/t/p/w300/xA2351253.jpg', type: 'tv' }
+        // Catalogues propres et distincts avec images stables (CDN direct)
+        const animeData = [
+            { id: '213713', title: 'Solo Leveling', img: 'https://images.justwatch.com/poster/310938637/s166/solo-leveling.webp', type: 'tv' },
+            { id: '94605', title: 'Arcane', img: 'https://images.justwatch.com/poster/258284564/s166/arcane.webp', type: 'tv' },
+            { id: '85937', title: 'Demon Slayer', img: 'https://images.justwatch.com/poster/151280385/s166/demon-slayer.webp', type: 'tv' },
+            { id: '37854', title: 'One Piece', img: 'https://images.justwatch.com/poster/128610787/s166/one-piece.webp', type: 'tv' }
         ];
 
-        async function fetchFrenchCategory(endpoint, containerId, type) {
-            const container = document.getElementById(containerId);
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/${endpoint}?api_key=${TMDB_KEY}&language=fr-FR&page=1`);
-                const data = await res.json();
-                
-                if (data.results && data.results.length > 0) {
-                    container.innerHTML = '';
-                    data.results.forEach(item => {
-                        const title = item.title || item.name;
-                        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/150x225?text=Affiche+N/A';
-                        
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.onclick = () => playMedia(type, item.id, title);
-                        card.innerHTML = `
-                            <img src="${poster}" alt="${title}" onerror="this.src='https://via.placeholder.com/150x225?text=Image+Indisponible'">
-                            <div class="card-title">${title}</div>
-                        `;
-                        container.appendChild(card);
-                    });
-                } else {
-                    renderFallback(containerId);
-                }
-            } catch (e) {
-                renderFallback(containerId);
-            }
-        }
+        const movieData = [
+            { id: '296096', title: 'Dernier Train pour Busan', img: 'https://images.justwatch.com/poster/240890691/s166/dernier-train-pour-busan.webp', type: 'movie' },
+            { id: '496243', title: 'Parasite', img: 'https://images.justwatch.com/poster/155609424/s166/parasite.webp', type: 'movie' },
+            { id: '1259', title: 'The Host', img: 'https://images.justwatch.com/poster/11101962/s166/the-host.webp', type: 'movie' }
+        ];
 
-        function renderFallback(containerId) {
+        const dramaData = [
+            { id: '93405', title: 'Squid Game', img: 'https://images.justwatch.com/poster/251390487/s166/squid-game.webp', type: 'tv' },
+            { id: '118320', title: 'All of Us Are Dead', img: 'https://images.justwatch.com/poster/260787498/s166/all-of-us-are-dead.webp', type: 'tv' },
+            { id: '67075', title: 'Goblin', img: 'https://images.justwatch.com/poster/17540203/s166/goblin.webp', type: 'tv' }
+        ];
+
+        function renderCategory(list, containerId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
-            fallbackAnime.forEach(item => {
+            list.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.onclick = () => playMedia(item.type, item.id, item.title);
@@ -210,7 +188,6 @@
         function playMedia(type, id, title) {
             document.getElementById('playing-title').innerText = title;
             const iframe = document.getElementById('video-iframe');
-            // Flux multi-langues VF automatique
             iframe.src = `https://vidsrc.me/embed/${type}?tmdb=${id}&lang=fr`;
             document.getElementById('player-modal').style.display = 'flex';
         }
@@ -221,31 +198,14 @@
             document.getElementById('player-modal').style.display = 'none';
         }
 
-        function handleSearch(e) {
-            if (e.key === 'Enter') {
-                const query = e.target.value.trim();
-                if (query) {
-                    fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&language=fr-FR&query=${encodeURIComponent(query)}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.results && data.results.length > 0) {
-                                const item = data.results[0];
-                                playMedia(item.media_type || 'movie', item.id, item.title || item.name);
-                            }
-                        });
-                }
-            }
-        }
-
-        // Enregistrement du Service Worker PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
         window.onload = () => {
-            fetchFrenchCategory('discover/tv?with_genres=16', 'anime-row', 'tv');
-            fetchFrenchCategory('discover/movie?with_original_language=ko', 'movies-row', 'movie');
-            fetchFrenchCategory('discover/tv?with_original_language=ko', 'dramas-row', 'tv');
+            renderCategory(animeData, 'anime-row');
+            renderCategory(movieData, 'movies-row');
+            renderCategory(dramaData, 'dramas-row');
         };
     </script>
 </body>
