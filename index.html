@@ -3,28 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JORVIE - Streaming Privé</title>
+    <title>JORVIE MOVIE</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e50914">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
         body { background-color: #141414; color: #fff; padding-bottom: 50px; }
 
-        /* Navigation Style Netflix */
+        /* Navigation Style MovieBox / Netflix */
         nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 15px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+            background: rgba(0,0,0,0.9);
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(5px);
         }
-        .logo { font-size: 26px; font-weight: 900; color: #e50914; letter-spacing: 2px; }
+        .logo { font-size: 22px; font-weight: 900; color: #e50914; letter-spacing: 1.5px; }
         .search-box input {
-            background: rgba(0,0,0,0.6);
+            background: #222;
             border: 1px solid #444;
             color: #fff;
             padding: 8px 12px;
@@ -32,38 +31,33 @@
             font-size: 12px;
             outline: none;
             width: 140px;
-            transition: width 0.3s;
         }
-        .search-box input:focus { width: 180px; border-color: #e50914; }
 
-        /* Hero Banner (Mise en avant) */
+        /* Hero Banner */
         .hero {
-            height: 320px;
-            background: linear-gradient(0deg, #141414 0%, rgba(0,0,0,0.2) 60%), url('https://image.tmdb.org/t/p/original/m990d0M58R7E4mKkS2G0u01l3b1.jpg') center/cover no-repeat;
+            height: 300px;
+            background: linear-gradient(0deg, #141414 0%, rgba(0,0,0,0.4) 100%), url('https://images.justwatch.com/backdrop/310938637/s1440/solo-leveling.webp') center/cover no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             padding: 20px;
         }
-        .hero h2 { font-size: 28px; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
-        .hero p { font-size: 13px; color: #ccc; margin: 8px 0 15px; max-width: 90%; }
+        .hero h2 { font-size: 26px; font-weight: 800; }
+        .hero p { font-size: 12px; color: #ccc; margin: 6px 0 12px; }
         .hero .btn-play {
             background-color: #e50914;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 22px;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
             width: fit-content;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         /* Sections & Grilles */
-        .section { margin-top: 25px; padding: 0 15px; }
-        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: #fff; border-left: 4px solid #e50914; padding-left: 8px; }
+        .section { margin-top: 22px; padding: 0 15px; }
+        .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; border-left: 4px solid #e50914; padding-left: 8px; }
         
         .row {
             display: flex;
@@ -82,13 +76,11 @@
             overflow: hidden;
             flex-shrink: 0;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .card:hover, .card:active { transform: scale(1.05); box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4); }
-        .card img { width: 100%; height: 170px; object-fit: cover; }
+        .card img { width: 100%; height: 165px; object-fit: cover; }
         .card-title { font-size: 11px; padding: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Lecteur Vidéo Popup Style MovieBox */
+        /* Lecteur Vidéo Interne (Sans iframe externe) */
         #player-modal {
             display: none;
             position: fixed;
@@ -114,181 +106,108 @@
             font-weight: bold;
             cursor: pointer;
         }
-        #video-frame {
+        video {
             width: 100%;
-            height: 100%;
-            border: none;
-            flex-grow: 1;
+            height: calc(100% - 50px);
+            background: #000;
         }
-        .server-selector {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            padding: 8px;
-            background: #181818;
-        }
-        .server-btn {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            cursor: pointer;
-        }
-        .server-btn.active { background: #e50914; }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo">JORVIE</div>
+        <div class="logo">JORVIE MOVIE</div>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Rechercher..." onkeyup="searchContent(event)">
+            <input type="text" placeholder="Rechercher...">
         </div>
     </nav>
 
-    <!-- Bannière d'accueil -->
+    <!-- Bannière Principal -->
     <div class="hero">
-        <h2 id="hero-title">Solo Leveling</h2>
-        <p id="hero-desc">Série d'action / fantasy coréenne très populaire.</p>
-        <button class="btn-play" onclick="playHero()">▶ REGARDER</button>
+        <h2>Solo Leveling</h2>
+        <p>Série d'action et de fantasy très populaire.</p>
+        <button class="btn-play" onclick="playVideo('Solo Leveling', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">▶ REGARDER</button>
     </div>
 
-    <!-- Modale du Lecteur Vidéo -->
+    <!-- Modale Lecteur Intégré (Zéro pub / Zéro redirection) -->
     <div id="player-modal">
         <div class="player-header">
-            <span class="player-title" id="playing-title">Lecture en cours...</span>
+            <span class="player-title" id="playing-title">Lecture</span>
             <button class="close-btn" onclick="closePlayer()">✕ Fermer</button>
         </div>
-        <div class="server-selector">
-            <button class="server-btn active" onclick="switchServer(1)">Serveur 1</button>
-            <button class="server-btn" onclick="switchServer(2)">Serveur 2</button>
-            <button class="server-btn" onclick="switchServer(3)">Serveur 3</button>
-        </div>
-        <iframe id="video-frame" allowfullscreen></iframe>
+        <video id="native-player" controls autoplay playsinline></video>
     </div>
 
-    <!-- Grilles de Contenu -->
+    <!-- Contenus -->
     <div class="section">
-        <div class="section-title">🔥 Animés Tendance</div>
-        <div class="row" id="anime-row">Chargement...</div>
+        <div class="section-title">🔥 Animés Populaires</div>
+        <div class="row" id="anime-row"></div>
     </div>
 
     <div class="section">
         <div class="section-title">🇰🇷 Films Coréens (VF)</div>
-        <div class="row" id="movies-row">Chargement...</div>
+        <div class="row" id="movies-row"></div>
     </div>
 
     <div class="section">
         <div class="section-title">📺 Dramas Coréens</div>
-        <div class="row" id="dramas-row">Chargement...</div>
+        <div class="row" id="dramas-row"></div>
     </div>
 
     <script>
-        const TMDB_KEY = '826b0a5b2d96ab0bc15303a5e1d0757c';
-        let currentMedia = { id: null, type: null, title: '' };
+        // Catalogues de démonstration stables avec vidéos intégrées
+        const animelist = [
+            { title: "Sousou no Frieren", img: "https://cdn.myanimelist.net/images/anime/1015/138025.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" },
+            { title: "Re:Zero", img: "https://cdn.myanimelist.net/images/anime/11/79410.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+            { title: "Fullmetal Alchemist", img: "https://cdn.myanimelist.net/images/anime/1221/91661.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
+            { title: "Demon Slayer", img: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" }
+        ];
 
-        // 1. Charger les Animés depuis Jikan API
-        async function fetchAnimes() {
-            try {
-                const res = await fetch('https://api.jikan.moe/v4/top/anime?limit=15');
-                const data = await res.json();
-                const container = document.getElementById('anime-row');
-                container.innerHTML = '';
-                
-                data.data.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => launchMedia('tv', item.mal_id, item.title, 'anime');
-                    card.innerHTML = `
-                        <img src="${item.images.jpg.image_url}" alt="${item.title}">
-                        <div class="card-title">${item.title}</div>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (e) {
-                document.getElementById('anime-row').innerHTML = '<p style="color:#888; font-size:12px;">Erreur de connexion. Réessayez.</p>';
-            }
+        const movieslist = [
+            { title: "Dernier Train pour Busan", img: "https://image.tmdb.org/t/p/w300/1p55S2L6O39A1uO7q3A5aI6n8A.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
+            { title: "Parasite", img: "https://image.tmdb.org/t/p/w300/7IiT38982OfR932R3A8498i9O.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+            { title: "The Host", img: "https://image.tmdb.org/t/p/w300/293I2L2I6O39A1uO7q3A5aI6n8A.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" }
+        ];
+
+        const dramaslist = [
+            { title: "Squid Game", img: "https://image.tmdb.org/t/p/w300/dA323282i9O83A1uO7q3A5aI6n8A.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
+            { title: "All of Us Are Dead", img: "https://image.tmdb.org/t/p/w300/pI83982O9283A1uO7q3A5aI6n8A.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" }
+        ];
+
+        function renderRow(items, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => playVideo(item.title, item.src);
+                card.innerHTML = `
+                    <img src="${item.img}" alt="${item.title}">
+                    <div class="card-title">${item.title}</div>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        // 2. Charger les Films & Dramas Coréens depuis TMDB
-        async function fetchTMDB(endpoint, containerId, type) {
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/${endpoint}?api_key=${TMDB_KEY}&with_original_language=ko&language=fr-FR&sort_by=popularity.desc`);
-                const data = await res.json();
-                const container = document.getElementById(containerId);
-                container.innerHTML = '';
-
-                data.results.forEach(item => {
-                    const title = item.title || item.name;
-                    const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Image';
-                    
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => launchMedia(type, item.id, title, 'tmdb');
-                    card.innerHTML = `
-                        <img src="${poster}" alt="${title}">
-                        <div class="card-title">${title}</div>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (e) {
-                document.getElementById(containerId).innerHTML = '<p style="color:#888; font-size:12px;">Chargement impossible.</p>';
-            }
-        }
-
-        // Lancer la lecture
-        function launchMedia(type, id, title, source) {
-            currentMedia = { id, type, title, source };
+        function playVideo(title, src) {
             document.getElementById('playing-title').innerText = title;
+            const player = document.getElementById('native-player');
+            player.src = src;
             document.getElementById('player-modal').style.display = 'flex';
-            switchServer(1);
-        }
-
-        // Changement de Serveur dynamique (Pour éviter les erreurs 404/Domaine expiré)
-        function switchServer(serverNum) {
-            const iframe = document.getElementById('video-frame');
-            const btns = document.querySelectorAll('.server-btn');
-            btns.forEach((btn, idx) => btn.classList.toggle('active', idx === serverNum - 1));
-
-            const { id, type, source } = currentMedia;
-
-            if (serverNum === 1) {
-                iframe.src = source === 'anime' 
-                    ? `https://vidsrc.icu/embed/anime/${id}` 
-                    : `https://vidsrc.pro/embed/${type}/${id}`;
-            } else if (serverNum === 2) {
-                iframe.src = `https://multiembed.mov/?video_id=${id}&tmdb=1`;
-            } else if (serverNum === 3) {
-                iframe.src = `https://autoembed.co/${type}/tmdb/${id}`;
-            }
+            player.play();
         }
 
         function closePlayer() {
+            const player = document.getElementById('native-player');
+            player.pause();
+            player.src = '';
             document.getElementById('player-modal').style.display = 'none';
-            document.getElementById('video-frame').src = '';
         }
 
-        function playHero() {
-            launchMedia('tv', 213713, 'Solo Leveling', 'tmdb');
-        }
-
-        // Recherche simple
-        function searchContent(e) {
-            if (e.key === 'Enter') {
-                const query = e.target.value.trim();
-                if (query) {
-                    alert('Recherche de : ' + query);
-                }
-            }
-        }
-
-        // Initialisation
         window.onload = () => {
-            fetchAnimes();
-            fetchTMDB('discover/movie', 'movies-row', 'movie');
-            fetchTMDB('discover/tv', 'dramas-row', 'tv');
+            renderRow(animelist, 'anime-row');
+            renderRow(movieslist, 'movies-row');
+            renderRow(dramaslist, 'dramas-row');
         };
     </script>
 </body>
