@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JORVIE - Animés & Dramas</title>
+    <title>JORVIE - Streaming FR</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff4081">
     <style>
         * { box-sizing: border-box; }
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
             background-color: #0b0c10; 
             color: #ffffff; 
             margin: 0; 
@@ -15,62 +17,82 @@
         }
         header { 
             text-align: center; 
-            padding: 20px 0; 
+            padding: 15px 0; 
             border-bottom: 1px solid #1f2833;
         }
         h1 { 
             color: #ff4081; 
-            font-size: 36px; 
-            letter-spacing: 3px; 
+            font-size: 32px; 
+            letter-spacing: 2px; 
             margin: 0; 
-            text-transform: uppercase;
             font-weight: 800;
         }
-        p.subtitle { color: #c5c6c7; font-size: 13px; margin-top: 6px; }
+        p.subtitle { color: #c5c6c7; font-size: 13px; margin-top: 4px; }
         
-        .category { margin-top: 30px; }
+        .category { margin-top: 25px; }
         .category h2 { 
-            font-size: 18px; 
+            font-size: 17px; 
             border-left: 4px solid #ff4081; 
             padding-left: 10px; 
             color: #66fcf1;
             margin-bottom: 12px;
         }
         
-        /* Grille défilante horizontalement pour mobile */
         .grid { 
             display: flex; 
             overflow-x: auto; 
             gap: 12px; 
-            padding-bottom: 15px;
-            scrollbar-width: thin;
+            padding-bottom: 10px;
         }
         .card { 
-            min-width: 130px; 
-            width: 130px; 
+            min-width: 125px; 
+            width: 125px; 
             background: #1f2833; 
             border-radius: 8px; 
             overflow: hidden; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-        .card img { 
-            width: 100%; 
-            height: 185px; 
-            object-fit: cover; 
-        }
+        .card:active { transform: scale(0.95); }
+        .card img { width: 100%; height: 175px; object-fit: cover; }
         .card p { 
             font-size: 11px; 
             text-align: center; 
-            padding: 8px 5px; 
+            padding: 6px 4px; 
             margin: 0; 
-            font-weight: 600;
             color: #fff;
-            height: 40px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* Lecteur Vidéo Popup */
+        #player-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #player-modal iframe {
+            width: 100%;
+            height: 70vh;
+            border: none;
+        }
+        .close-btn {
+            background: #ff4081;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -81,76 +103,119 @@
         <p class="subtitle">Espace Streaming Privé pour Jorvie ❤️</p>
     </header>
 
-    <!-- Catégorie Animés Romance -->
-    <div class="category">
-        <h2>💖 Animés Romance</h2>
-        <div class="grid" id="romance-anime">Chargement...</div>
+    <!-- Lecteur Vidéo Popup -->
+    <div id="player-modal">
+        <iframe id="video-frame" src="" allowfullscreen></iframe>
+        <button class="close-btn" onclick="closePlayer()">✖ Fermer le lecteur</button>
     </div>
 
-    <!-- Catégorie Animés Action -->
+    <!-- Catégories -->
     <div class="category">
-        <h2>🔥 Animés Action</h2>
-        <div class="grid" id="action-anime">Chargement...</div>
+        <h2>💖 Animés (VF / VOSTFR)</h2>
+        <div class="grid" id="anime-list">Chargement des animés...</div>
     </div>
 
-    <!-- Catégorie Films & Dramas Coréens -->
     <div class="category">
-        <h2>🇰🇷 Films & Dramas Coréens</h2>
-        <div class="grid" id="korean-movies">Chargement...</div>
+        <h2>🇰🇷 Films Coréens (VF)</h2>
+        <div class="grid" id="korean-movies">Chargement des films...</div>
+    </div>
+
+    <div class="category">
+        <h2>📺 Dramas Coréens (Séries VF)</h2>
+        <div class="grid" id="korean-dramas">Chargement des séries...</div>
     </div>
 
     <script>
-        // Clé API gratuite TMDB pour charger les films coréens réels
-        const TMDB_API_KEY = '826b0a5b2d96ab0bc15303a5e1d0757c'; 
+        const TMDB_API_KEY = '826b0a5b2d96ab0bc15303a5e1d0757c';
 
-        // 1. Charger les Animés réels (via l'API Kitsu)
-        function loadAnime(category, containerId) {
-            fetch(`https://kitsu.io/api/edge/anime?filter[categories]=${category}&page[limit]=12`)
-                .then(res => res.json())
-                .then(data => {
-                    const container = document.getElementById(containerId);
-                    container.innerHTML = '';
-                    data.data.forEach(item => {
-                        const title = item.attributes.canonicalTitle;
-                        const poster = item.attributes.posterImage ? item.attributes.posterImage.small : '';
-                        
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.innerHTML = `
-                            <img src="${poster}" alt="${title}">
-                            <p>${title}</p>
-                        `;
-                        container.appendChild(card);
-                    });
-                });
-        }
-
-        // 2. Charger les Films/Dramas Coréens réels (via TMDB API)
-        function loadKoreanContent() {
-            fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_original_language=ko&sort_by=popularity.desc`)
+        // Charger les Films Coréens en Français
+        function loadKoreanMovies() {
+            fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_original_language=ko&language=fr-FR&sort_by=popularity.desc`)
                 .then(res => res.json())
                 .then(data => {
                     const container = document.getElementById('korean-movies');
                     container.innerHTML = '';
                     data.results.forEach(item => {
-                        const title = item.name || item.title;
+                        const title = item.title;
+                        const id = item.id;
                         const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '';
                         
                         const card = document.createElement('div');
                         card.className = 'card';
-                        card.innerHTML = `
-                            <img src="${poster}" alt="${title}">
-                            <p>${title}</p>
-                        `;
+                        card.onclick = () => openPlayer('movie', id);
+                        card.innerHTML = `<img src="${poster}" alt="${title}"><p>${title}</p>`;
                         container.appendChild(card);
                     });
                 });
         }
 
-        // Lancement au chargement de la page
-        loadAnime('romance', 'romance-anime');
-        loadAnime('action', 'action-anime');
-        loadKoreanContent();
+        // Charger les Dramas Coréens en Français
+        function loadKoreanDramas() {
+            fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_original_language=ko&language=fr-FR&sort_by=popularity.desc`)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('korean-dramas');
+                    container.innerHTML = '';
+                    data.results.forEach(item => {
+                        const title = item.name;
+                        const id = item.id;
+                        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '';
+                        
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.onclick = () => openPlayer('tv', id);
+                        card.innerHTML = `<img src="${poster}" alt="${title}"><p>${title}</p>`;
+                        container.appendChild(card);
+                    });
+                });
+        }
+
+        // Charger les Animés Japonais avec titres en Français
+        function loadAnime() {
+            fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_genres=16&with_original_language=ja&language=fr-FR&sort_by=popularity.desc`)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('anime-list');
+                    container.innerHTML = '';
+                    data.results.forEach(item => {
+                        const title = item.name;
+                        const id = item.id;
+                        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '';
+                        
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.onclick = () => openPlayer('tv', id);
+                        card.innerHTML = `<img src="${poster}" alt="${title}"><p>${title}</p>`;
+                        container.appendChild(card);
+                    });
+                });
+        }
+
+        // Ouverture du lecteur vidéo multilingue
+        function openPlayer(type, id) {
+            const player = document.getElementById('player-modal');
+            const iframe = document.getElementById('video-frame');
+            // Utilisation du lecteur SmashyStream (supporte le choix des langues / sous-titres FR)
+            iframe.src = `https://embed.smashystream.com/playere.php?tmdb=${id}`;
+            player.style.display = 'flex';
+        }
+
+        function closePlayer() {
+            const player = document.getElementById('player-modal');
+            const iframe = document.getElementById('video-frame');
+            iframe.src = '';
+            player.style.display = 'none';
+        }
+
+        // Enregistrement du Service Worker pour la PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        // Démarrage
+        loadAnime();
+        loadKoreanMovies();
+        loadKoreanDramas();
     </script>
 
 </body>
