@@ -6,81 +6,82 @@
     <title>JORVIE MOVIE</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e50914">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/747/747310.png">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
-        body { background-color: #141414; color: #fff; padding-bottom: 50px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #141414; color: #fff; padding-bottom: 40px; user-select: none; }
 
-        /* Navigation Style MovieBox / Netflix */
+        /* Header / Navbar */
         nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 20px;
-            background: rgba(0,0,0,0.9);
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.95);
             position: sticky;
             top: 0;
             z-index: 100;
         }
-        .logo { font-size: 22px; font-weight: 900; color: #e50914; letter-spacing: 1.5px; }
+        .logo { font-size: 20px; font-weight: 900; color: #e50914; letter-spacing: 1px; }
         .search-box input {
-            background: #222;
-            border: 1px solid #444;
+            background: #262626;
+            border: 1px solid #333;
             color: #fff;
-            padding: 8px 12px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 16px;
             font-size: 12px;
             outline: none;
-            width: 140px;
+            width: 130px;
         }
 
-        /* Hero Banner */
+        /* Bannière Principale */
         .hero {
-            height: 300px;
-            background: linear-gradient(0deg, #141414 0%, rgba(0,0,0,0.4) 100%), url('https://images.justwatch.com/backdrop/310938637/s1440/solo-leveling.webp') center/cover no-repeat;
+            height: 280px;
+            background: linear-gradient(0deg, #141414 0%, rgba(0,0,0,0.3) 100%), url('https://image.tmdb.org/t/p/w780/m990d0M58R7E4mKkS2G0u01l3b1.jpg') center/cover no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 20px;
+            padding: 16px;
         }
-        .hero h2 { font-size: 26px; font-weight: 800; }
-        .hero p { font-size: 12px; color: #ccc; margin: 6px 0 12px; }
+        .hero h2 { font-size: 24px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .hero p { font-size: 12px; color: #ccc; margin: 4px 0 10px; }
         .hero .btn-play {
             background-color: #e50914;
             color: white;
             border: none;
-            padding: 10px 22px;
+            padding: 8px 18px;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
             width: fit-content;
         }
 
-        /* Sections & Grilles */
-        .section { margin-top: 22px; padding: 0 15px; }
-        .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; border-left: 4px solid #e50914; padding-left: 8px; }
+        /* Sections & Affiches */
+        .section { margin-top: 20px; padding: 0 12px; }
+        .section-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; border-left: 3px solid #e50914; padding-left: 8px; }
         
         .row {
             display: flex;
             overflow-x: auto;
-            gap: 12px;
-            padding-bottom: 10px;
+            gap: 10px;
+            padding-bottom: 8px;
             scrollbar-width: none;
         }
         .row::-webkit-scrollbar { display: none; }
 
         .card {
-            min-width: 120px;
-            width: 120px;
-            background: #222;
+            min-width: 110px;
+            width: 110px;
+            background: #1f1f1f;
             border-radius: 6px;
             overflow: hidden;
             flex-shrink: 0;
             cursor: pointer;
         }
-        .card img { width: 100%; height: 165px; object-fit: cover; }
-        .card-title { font-size: 11px; padding: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card img { width: 100%; height: 155px; object-fit: cover; display: block; background: #2a2a2a; }
+        .card-title { font-size: 11px; padding: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ddd; }
 
-        /* Lecteur Vidéo Interne (Sans iframe externe) */
+        /* Lecteur Vidéo Plein Écran */
         #player-modal {
             display: none;
             position: fixed;
@@ -93,24 +94,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
+            padding: 10px 16px;
             background: #111;
         }
-        .player-title { font-size: 14px; font-weight: bold; color: #fff; }
+        .player-title { font-size: 13px; font-weight: bold; color: #fff; }
         .close-btn {
             background: #e50914;
             color: #fff;
             border: none;
-            padding: 6px 15px;
-            border-radius: 20px;
+            padding: 5px 12px;
+            border-radius: 14px;
             font-weight: bold;
             cursor: pointer;
         }
-        video {
-            width: 100%;
-            height: calc(100% - 50px);
-            background: #000;
-        }
+        .iframe-container { width: 100%; height: calc(100% - 45px); flex-grow: 1; }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
@@ -118,29 +116,30 @@
     <nav>
         <div class="logo">JORVIE MOVIE</div>
         <div class="search-box">
-            <input type="text" placeholder="Rechercher...">
+            <input type="text" id="searchInput" placeholder="Rechercher (VF)..." onkeypress="handleSearch(event)">
         </div>
     </nav>
 
-    <!-- Bannière Principal -->
     <div class="hero">
-        <h2>Solo Leveling</h2>
-        <p>Série d'action et de fantasy très populaire.</p>
-        <button class="btn-play" onclick="playVideo('Solo Leveling', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">▶ REGARDER</button>
+        <h2>Solo Leveling (VF)</h2>
+        <p>Série d'action et de fantasy coréenne.</p>
+        <button class="btn-play" onclick="playMedia('tv', '213713', 'Solo Leveling (VF)')">▶ REGARDER</button>
     </div>
 
-    <!-- Modale Lecteur Intégré (Zéro pub / Zéro redirection) -->
+    <!-- Lecteur Vidéo Intégré -->
     <div id="player-modal">
         <div class="player-header">
             <span class="player-title" id="playing-title">Lecture</span>
             <button class="close-btn" onclick="closePlayer()">✕ Fermer</button>
         </div>
-        <video id="native-player" controls autoplay playsinline></video>
+        <div class="iframe-container">
+            <iframe id="video-iframe" allowfullscreen></iframe>
+        </div>
     </div>
 
     <!-- Contenus -->
     <div class="section">
-        <div class="section-title">🔥 Animés Populaires</div>
+        <div class="section-title">🔥 Animés Populaires (VF)</div>
         <div class="row" id="anime-row"></div>
     </div>
 
@@ -150,37 +149,56 @@
     </div>
 
     <div class="section">
-        <div class="section-title">📺 Dramas Coréens</div>
+        <div class="section-title">📺 Dramas Coréens (VF)</div>
         <div class="row" id="dramas-row"></div>
     </div>
 
     <script>
-        // Catalogues de démonstration stables avec vidéos intégrées
-        const animelist = [
-            { title: "Sousou no Frieren", img: "https://cdn.myanimelist.net/images/anime/1015/138025.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" },
-            { title: "Re:Zero", img: "https://cdn.myanimelist.net/images/anime/11/79410.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-            { title: "Fullmetal Alchemist", img: "https://cdn.myanimelist.net/images/anime/1221/91661.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
-            { title: "Demon Slayer", img: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" }
+        const TMDB_KEY = '826b0a5b2d96ab0bc15303a5e1d0757c';
+
+        // Données de secours stables si TMDB bloque temporairement
+        const fallbackAnime = [
+            { id: '213713', title: 'Solo Leveling', img: 'https://image.tmdb.org/t/p/w300/1p55S2L6O39A1uO7q3A5aI6n8A.jpg', type: 'tv' },
+            { id: '94605', title: 'Arcane', img: 'https://image.tmdb.org/t/p/w300/fqld221f2A332612.jpg', type: 'tv' },
+            { id: '85937', title: 'Demon Slayer', img: 'https://image.tmdb.org/t/p/w300/xA2351253.jpg', type: 'tv' }
         ];
 
-        const movieslist = [
-            { title: "Dernier Train pour Busan", img: "https://image.tmdb.org/t/p/w300/1p55S2L6O39A1uO7q3A5aI6n8A.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" },
-            { title: "Parasite", img: "https://image.tmdb.org/t/p/w300/7IiT38982OfR932R3A8498i9O.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-            { title: "The Host", img: "https://image.tmdb.org/t/p/w300/293I2L2I6O39A1uO7q3A5aI6n8A.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" }
-        ];
+        async function fetchFrenchCategory(endpoint, containerId, type) {
+            const container = document.getElementById(containerId);
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/${endpoint}?api_key=${TMDB_KEY}&language=fr-FR&page=1`);
+                const data = await res.json();
+                
+                if (data.results && data.results.length > 0) {
+                    container.innerHTML = '';
+                    data.results.forEach(item => {
+                        const title = item.title || item.name;
+                        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/150x225?text=Affiche+N/A';
+                        
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.onclick = () => playMedia(type, item.id, title);
+                        card.innerHTML = `
+                            <img src="${poster}" alt="${title}" onerror="this.src='https://via.placeholder.com/150x225?text=Image+Indisponible'">
+                            <div class="card-title">${title}</div>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    renderFallback(containerId);
+                }
+            } catch (e) {
+                renderFallback(containerId);
+            }
+        }
 
-        const dramaslist = [
-            { title: "Squid Game", img: "https://image.tmdb.org/t/p/w300/dA323282i9O83A1uO7q3A5aI6n8A.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" },
-            { title: "All of Us Are Dead", img: "https://image.tmdb.org/t/p/w300/pI83982O9283A1uO7q3A5aI6n8A.jpg", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" }
-        ];
-
-        function renderRow(items, containerId) {
+        function renderFallback(containerId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
-            items.forEach(item => {
+            fallbackAnime.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.onclick = () => playVideo(item.title, item.src);
+                card.onclick = () => playMedia(item.type, item.id, item.title);
                 card.innerHTML = `
                     <img src="${item.img}" alt="${item.title}">
                     <div class="card-title">${item.title}</div>
@@ -189,25 +207,45 @@
             });
         }
 
-        function playVideo(title, src) {
+        function playMedia(type, id, title) {
             document.getElementById('playing-title').innerText = title;
-            const player = document.getElementById('native-player');
-            player.src = src;
+            const iframe = document.getElementById('video-iframe');
+            // Flux multi-langues VF automatique
+            iframe.src = `https://vidsrc.me/embed/${type}?tmdb=${id}&lang=fr`;
             document.getElementById('player-modal').style.display = 'flex';
-            player.play();
         }
 
         function closePlayer() {
-            const player = document.getElementById('native-player');
-            player.pause();
-            player.src = '';
+            const iframe = document.getElementById('video-iframe');
+            iframe.src = '';
             document.getElementById('player-modal').style.display = 'none';
         }
 
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (query) {
+                    fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&language=fr-FR&query=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.results && data.results.length > 0) {
+                                const item = data.results[0];
+                                playMedia(item.media_type || 'movie', item.id, item.title || item.name);
+                            }
+                        });
+                }
+            }
+        }
+
+        // Enregistrement du Service Worker PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+
         window.onload = () => {
-            renderRow(animelist, 'anime-row');
-            renderRow(movieslist, 'movies-row');
-            renderRow(dramaslist, 'dramas-row');
+            fetchFrenchCategory('discover/tv?with_genres=16', 'anime-row', 'tv');
+            fetchFrenchCategory('discover/movie?with_original_language=ko', 'movies-row', 'movie');
+            fetchFrenchCategory('discover/tv?with_original_language=ko', 'dramas-row', 'tv');
         };
     </script>
 </body>
