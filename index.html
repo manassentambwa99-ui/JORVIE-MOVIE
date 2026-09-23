@@ -3,242 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JORVIE - Streaming FR</title>
+    <title>JORVIE - Streaming Privé</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ff4081">
+    <meta name="theme-color" content="#e50914">
     <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background-color: #0b0c10; 
-            color: #ffffff; 
-            margin: 0; 
-            padding: 15px; 
-        }
-        header { 
-            text-align: center; 
-            padding: 15px 0; 
-            border-bottom: 1px solid #1f2833;
-        }
-        h1 { 
-            color: #ff4081; 
-            font-size: 32px; 
-            letter-spacing: 2px; 
-            margin: 0; 
-            font-weight: 800;
-        }
-        p.subtitle { color: #c5c6c7; font-size: 13px; margin-top: 4px; }
-        
-        .category { margin-top: 25px; }
-        .category h2 { 
-            font-size: 17px; 
-            border-left: 4px solid #ff4081; 
-            padding-left: 10px; 
-            color: #66fcf1;
-            margin-bottom: 12px;
-        }
-        
-        .grid { 
-            display: flex; 
-            overflow-x: auto; 
-            gap: 12px; 
-            padding-bottom: 10px;
-            min-height: 200px;
-        }
-        .card { 
-            min-width: 125px; 
-            width: 125px; 
-            background: #1f2833; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            cursor: pointer;
-            transition: transform 0.2s;
-            flex-shrink: 0;
-        }
-        .card:active { transform: scale(0.95); }
-        .card img { width: 100%; height: 175px; object-fit: cover; }
-        .card p { 
-            font-size: 11px; 
-            text-align: center; 
-            padding: 6px 4px; 
-            margin: 0; 
-            color: #fff;
-            height: 38px;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        body { background-color: #141414; color: #fff; padding-bottom: 50px; }
+
+        /* Navigation Style Netflix */
+        nav {
             display: flex;
             align-items: center;
-            justify-content: center;
-            line-height: 1.2;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        .logo { font-size: 26px; font-weight: 900; color: #e50914; letter-spacing: 2px; }
+        .search-box input {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            outline: none;
+            width: 140px;
+            transition: width 0.3s;
+        }
+        .search-box input:focus { width: 180px; border-color: #e50914; }
+
+        /* Hero Banner (Mise en avant) */
+        .hero {
+            height: 320px;
+            background: linear-gradient(0deg, #141414 0%, rgba(0,0,0,0.2) 60%), url('https://image.tmdb.org/t/p/original/m990d0M58R7E4mKkS2G0u01l3b1.jpg') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+        .hero h2 { font-size: 28px; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        .hero p { font-size: 13px; color: #ccc; margin: 8px 0 15px; max-width: 90%; }
+        .hero .btn-play {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* Lecteur Vidéo Popup */
+        /* Sections & Grilles */
+        .section { margin-top: 25px; padding: 0 15px; }
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: #fff; border-left: 4px solid #e50914; padding-left: 8px; }
+        
+        .row {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
+        .row::-webkit-scrollbar { display: none; }
+
+        .card {
+            min-width: 120px;
+            width: 120px;
+            background: #222;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover, .card:active { transform: scale(1.05); box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4); }
+        .card img { width: 100%; height: 170px; object-fit: cover; }
+        .card-title { font-size: 11px; padding: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Lecteur Vidéo Popup Style MovieBox */
         #player-modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
+            background: #000;
             z-index: 1000;
             flex-direction: column;
+        }
+        .player-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+            padding: 12px 20px;
+            background: #111;
         }
-        #player-modal iframe {
-            width: 100%;
-            height: 70vh;
-            border: none;
-        }
+        .player-title { font-size: 14px; font-weight: bold; color: #fff; }
         .close-btn {
-            background: #ff4081;
-            color: white;
-            padding: 12px 25px;
+            background: #e50914;
+            color: #fff;
             border: none;
+            padding: 6px 15px;
             border-radius: 20px;
-            margin-top: 15px;
             font-weight: bold;
-            font-size: 14px;
             cursor: pointer;
         }
+        #video-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            flex-grow: 1;
+        }
+        .server-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 8px;
+            background: #181818;
+        }
+        .server-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .server-btn.active { background: #e50914; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>JORVIE</h1>
-        <p class="subtitle">Espace Streaming Privé pour Jorvie ❤️</p>
-    </header>
+    <nav>
+        <div class="logo">JORVIE</div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher..." onkeyup="searchContent(event)">
+        </div>
+    </nav>
 
-    <!-- Lecteur Vidéo Popup -->
+    <!-- Bannière d'accueil -->
+    <div class="hero">
+        <h2 id="hero-title">Solo Leveling</h2>
+        <p id="hero-desc">Série d'action / fantasy coréenne très populaire.</p>
+        <button class="btn-play" onclick="playHero()">▶ REGARDER</button>
+    </div>
+
+    <!-- Modale du Lecteur Vidéo -->
     <div id="player-modal">
-        <iframe id="video-frame" src="" allowfullscreen></iframe>
-        <button class="close-btn" onclick="closePlayer()">✖ Fermer le lecteur</button>
+        <div class="player-header">
+            <span class="player-title" id="playing-title">Lecture en cours...</span>
+            <button class="close-btn" onclick="closePlayer()">✕ Fermer</button>
+        </div>
+        <div class="server-selector">
+            <button class="server-btn active" onclick="switchServer(1)">Serveur 1</button>
+            <button class="server-btn" onclick="switchServer(2)">Serveur 2</button>
+            <button class="server-btn" onclick="switchServer(3)">Serveur 3</button>
+        </div>
+        <iframe id="video-frame" allowfullscreen></iframe>
     </div>
 
-    <!-- Catégories -->
-    <div class="category">
-        <h2>💖 Animés Populaires</h2>
-        <div class="grid" id="anime-list">Chargement des animés...</div>
+    <!-- Grilles de Contenu -->
+    <div class="section">
+        <div class="section-title">🔥 Animés Tendance</div>
+        <div class="row" id="anime-row">Chargement...</div>
     </div>
 
-    <div class="category">
-        <h2>🇰🇷 Films Coréens (VF)</h2>
-        <div class="grid" id="korean-movies">Chargement des films...</div>
+    <div class="section">
+        <div class="section-title">🇰🇷 Films Coréens (VF)</div>
+        <div class="row" id="movies-row">Chargement...</div>
     </div>
 
-    <div class="category">
-        <h2>📺 Dramas Coréens (VF)</h2>
-        <div class="grid" id="korean-dramas">Chargement des séries...</div>
+    <div class="section">
+        <div class="section-title">📺 Dramas Coréens</div>
+        <div class="row" id="dramas-row">Chargement...</div>
     </div>
 
     <script>
-        const TMDB_API_KEY = '826b0a5b2d96ab0bc15303a5e1d0757c';
+        const TMDB_KEY = '826b0a5b2d96ab0bc15303a5e1d0757c';
+        let currentMedia = { id: null, type: null, title: '' };
 
-        // 1. Charger les Animés via Jikan API (MyAnimeList) - Ultra stable et gratuit
-        function loadAnime() {
-            fetch('https://api.jikan.moe/v4/top/anime?limit=15')
-                .then(res => res.json())
-                .then(data => {
-                    const container = document.getElementById('anime-list');
-                    container.innerHTML = '';
-                    data.data.forEach(item => {
-                        const title = item.title_japanese || item.title;
-                        const displayTitle = item.title;
-                        const poster = item.images.jpg.image_url;
-                        
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.onclick = () => openAnimePlayer(displayTitle);
-                        card.innerHTML = `<img src="${poster}" alt="${displayTitle}"><p>${displayTitle}</p>`;
-                        container.appendChild(card);
-                    });
-                })
-                .catch(err => {
-                    document.getElementById('anime-list').innerHTML = '<p style="color:#aaa; padding:10px;">Erreur de chargement des animés. Réessayez.</p>';
+        // 1. Charger les Animés depuis Jikan API
+        async function fetchAnimes() {
+            try {
+                const res = await fetch('https://api.jikan.moe/v4/top/anime?limit=15');
+                const data = await res.json();
+                const container = document.getElementById('anime-row');
+                container.innerHTML = '';
+                
+                data.data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => launchMedia('tv', item.mal_id, item.title, 'anime');
+                    card.innerHTML = `
+                        <img src="${item.images.jpg.image_url}" alt="${item.title}">
+                        <div class="card-title">${item.title}</div>
+                    `;
+                    container.appendChild(card);
                 });
+            } catch (e) {
+                document.getElementById('anime-row').innerHTML = '<p style="color:#888; font-size:12px;">Erreur de connexion. Réessayez.</p>';
+            }
         }
 
-        // 2. Charger les Films Coréens (TMDB)
-        function loadKoreanMovies() {
-            fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_original_language=ko&language=fr-FR&sort_by=popularity.desc`)
-                .then(res => res.json())
-                .then(data => {
-                    const container = document.getElementById('korean-movies');
-                    container.innerHTML = '';
-                    data.results.forEach(item => {
-                        const title = item.title;
-                        const id = item.id;
-                        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '';
-                        
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.onclick = () => openMoviePlayer('movie', id);
-                        card.innerHTML = `<img src="${poster}" alt="${title}"><p>${title}</p>`;
-                        container.appendChild(card);
-                    });
-                })
-                .catch(err => {
-                    document.getElementById('korean-movies').innerHTML = '<p style="color:#aaa; padding:10px;">Erreur de chargement des films.</p>';
+        // 2. Charger les Films & Dramas Coréens depuis TMDB
+        async function fetchTMDB(endpoint, containerId, type) {
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/${endpoint}?api_key=${TMDB_KEY}&with_original_language=ko&language=fr-FR&sort_by=popularity.desc`);
+                const data = await res.json();
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+
+                data.results.forEach(item => {
+                    const title = item.title || item.name;
+                    const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Image';
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => launchMedia(type, item.id, title, 'tmdb');
+                    card.innerHTML = `
+                        <img src="${poster}" alt="${title}">
+                        <div class="card-title">${title}</div>
+                    `;
+                    container.appendChild(card);
                 });
+            } catch (e) {
+                document.getElementById(containerId).innerHTML = '<p style="color:#888; font-size:12px;">Chargement impossible.</p>';
+            }
         }
 
-        // 3. Charger les Dramas Coréens (TMDB)
-        function loadKoreanDramas() {
-            fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_original_language=ko&language=fr-FR&sort_by=popularity.desc`)
-                .then(res => res.json())
-                .then(data => {
-                    const container = document.getElementById('korean-dramas');
-                    container.innerHTML = '';
-                    data.results.forEach(item => {
-                        const title = item.name;
-                        const id = item.id;
-                        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '';
-                        
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.onclick = () => openMoviePlayer('tv', id);
-                        card.innerHTML = `<img src="${poster}" alt="${title}"><p>${title}</p>`;
-                        container.appendChild(card);
-                    });
-                })
-                .catch(err => {
-                    document.getElementById('korean-dramas').innerHTML = '<p style="color:#aaa; padding:10px;">Erreur de chargement des dramas.</p>';
-                });
+        // Lancer la lecture
+        function launchMedia(type, id, title, source) {
+            currentMedia = { id, type, title, source };
+            document.getElementById('playing-title').innerText = title;
+            document.getElementById('player-modal').style.display = 'flex';
+            switchServer(1);
         }
 
-        // Ouverture du lecteur pour les Films/Dramas
-        function openMoviePlayer(type, id) {
-            const player = document.getElementById('player-modal');
+        // Changement de Serveur dynamique (Pour éviter les erreurs 404/Domaine expiré)
+        function switchServer(serverNum) {
             const iframe = document.getElementById('video-frame');
-            iframe.src = `https://vidsrc.to/embed/${type}/${id}`;
-            player.style.display = 'flex';
-        }
+            const btns = document.querySelectorAll('.server-btn');
+            btns.forEach((btn, idx) => btn.classList.toggle('active', idx === serverNum - 1));
 
-        // Ouverture du lecteur spécifique aux Animés
-        function openAnimePlayer(title) {
-            const player = document.getElementById('player-modal');
-            const iframe = document.getElementById('video-frame');
-            const formattedTitle = encodeURIComponent(title);
-            iframe.src = `https://2embed.org/embed/anime?title=${formattedTitle}`;
-            player.style.display = 'flex';
+            const { id, type, source } = currentMedia;
+
+            if (serverNum === 1) {
+                iframe.src = source === 'anime' 
+                    ? `https://vidsrc.icu/embed/anime/${id}` 
+                    : `https://vidsrc.pro/embed/${type}/${id}`;
+            } else if (serverNum === 2) {
+                iframe.src = `https://multiembed.mov/?video_id=${id}&tmdb=1`;
+            } else if (serverNum === 3) {
+                iframe.src = `https://autoembed.co/${type}/tmdb/${id}`;
+            }
         }
 
         function closePlayer() {
-            const player = document.getElementById('player-modal');
-            const iframe = document.getElementById('video-frame');
-            iframe.src = '';
-            player.style.display = 'none';
+            document.getElementById('player-modal').style.display = 'none';
+            document.getElementById('video-frame').src = '';
         }
 
-        // Enregistrement du Service Worker PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
+        function playHero() {
+            launchMedia('tv', 213713, 'Solo Leveling', 'tmdb');
         }
 
-        // Lancement au chargement de la page
+        // Recherche simple
+        function searchContent(e) {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (query) {
+                    alert('Recherche de : ' + query);
+                }
+            }
+        }
+
+        // Initialisation
         window.onload = () => {
-            loadAnime();
-            loadKoreanMovies();
-            loadKoreanDramas();
+            fetchAnimes();
+            fetchTMDB('discover/movie', 'movies-row', 'movie');
+            fetchTMDB('discover/tv', 'dramas-row', 'tv');
         };
     </script>
-
 </body>
 </html>
