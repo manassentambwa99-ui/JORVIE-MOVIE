@@ -43,6 +43,7 @@
             overflow-x: auto; 
             gap: 12px; 
             padding-bottom: 10px;
+            min-height: 200px;
         }
         .card { 
             min-width: 125px; 
@@ -52,6 +53,7 @@
             overflow: hidden; 
             cursor: pointer;
             transition: transform 0.2s;
+            flex-shrink: 0;
         }
         .card:active { transform: scale(0.95); }
         .card img { width: 100%; height: 175px; object-fit: cover; }
@@ -65,6 +67,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 1.2;
         }
 
         /* Lecteur Vidéo Popup */
@@ -111,7 +114,7 @@
 
     <!-- Catégories -->
     <div class="category">
-        <h2>💖 Animés (VF / VOSTFR)</h2>
+        <h2>💖 Animés Populaires</h2>
         <div class="grid" id="anime-list">Chargement des animés...</div>
     </div>
 
@@ -121,14 +124,38 @@
     </div>
 
     <div class="category">
-        <h2>📺 Dramas Coréens (Séries VF)</h2>
+        <h2>📺 Dramas Coréens (VF)</h2>
         <div class="grid" id="korean-dramas">Chargement des séries...</div>
     </div>
 
     <script>
         const TMDB_API_KEY = '826b0a5b2d96ab0bc15303a5e1d0757c';
 
-        // Charger les Films Coréens en Français
+        // 1. Charger les Animés via Jikan API (MyAnimeList) - Ultra stable et gratuit
+        function loadAnime() {
+            fetch('https://api.jikan.moe/v4/top/anime?limit=15')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('anime-list');
+                    container.innerHTML = '';
+                    data.data.forEach(item => {
+                        const title = item.title_japanese || item.title;
+                        const displayTitle = item.title;
+                        const poster = item.images.jpg.image_url;
+                        
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.onclick = () => openAnimePlayer(displayTitle);
+                        card.innerHTML = `<img src="${poster}" alt="${displayTitle}"><p>${displayTitle}</p>`;
+                        container.appendChild(card);
+                    });
+                })
+                .catch(err => {
+                    document.getElementById('anime-list').innerHTML = '<p style="color:#aaa; padding:10px;">Erreur de chargement des animés. Réessayez.</p>';
+                });
+        }
+
+        // 2. Charger les Films Coréens (TMDB)
         function loadKoreanMovies() {
             fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_original_language=ko&language=fr-FR&sort_by=popularity.desc`)
                 .then(res => res.json())
@@ -142,14 +169,17 @@
                         
                         const card = document.createElement('div');
                         card.className = 'card';
-                        card.onclick = () => openPlayer('movie', id);
+                        card.onclick = () => openMoviePlayer('movie', id);
                         card.innerHTML = `<img src="${poster}" alt="${title}"><p>${title}</p>`;
                         container.appendChild(card);
                     });
+                })
+                .catch(err => {
+                    document.getElementById('korean-movies').innerHTML = '<p style="color:#aaa; padding:10px;">Erreur de chargement des films.</p>';
                 });
         }
 
-        // Charger les Dramas Coréens en Français
+        // 3. Charger les Dramas Coréens (TMDB)
         function loadKoreanDramas() {
             fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_original_language=ko&language=fr-FR&sort_by=popularity.desc`)
                 .then(res => res.json())
@@ -163,40 +193,30 @@
                         
                         const card = document.createElement('div');
                         card.className = 'card';
-                        card.onclick = () => openPlayer('tv', id);
+                        card.onclick = () => openMoviePlayer('tv', id);
                         card.innerHTML = `<img src="${poster}" alt="${title}"><p>${title}</p>`;
                         container.appendChild(card);
                     });
+                })
+                .catch(err => {
+                    document.getElementById('korean-dramas').innerHTML = '<p style="color:#aaa; padding:10px;">Erreur de chargement des dramas.</p>';
                 });
         }
 
-        // Charger les Animés Japonais avec titres en Français
-        function loadAnime() {
-            fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_genres=16&with_original_language=ja&language=fr-FR&sort_by=popularity.desc`)
-                .then(res => res.json())
-                .then(data => {
-                    const container = document.getElementById('anime-list');
-                    container.innerHTML = '';
-                    data.results.forEach(item => {
-                        const title = item.name;
-                        const id = item.id;
-                        const poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '';
-                        
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.onclick = () => openPlayer('tv', id);
-                        card.innerHTML = `<img src="${poster}" alt="${title}"><p>${title}</p>`;
-                        container.appendChild(card);
-                    });
-                });
-        }
-
-        // Ouverture du lecteur vidéo multilingue
-        function openPlayer(type, id) {
+        // Ouverture du lecteur pour les Films/Dramas
+        function openMoviePlayer(type, id) {
             const player = document.getElementById('player-modal');
             const iframe = document.getElementById('video-frame');
-            // Utilisation du lecteur SmashyStream (supporte le choix des langues / sous-titres FR)
-            iframe.src = `https://embed.smashystream.com/playere.php?tmdb=${id}`;
+            iframe.src = `https://vidsrc.to/embed/${type}/${id}`;
+            player.style.display = 'flex';
+        }
+
+        // Ouverture du lecteur spécifique aux Animés
+        function openAnimePlayer(title) {
+            const player = document.getElementById('player-modal');
+            const iframe = document.getElementById('video-frame');
+            const formattedTitle = encodeURIComponent(title);
+            iframe.src = `https://2embed.org/embed/anime?title=${formattedTitle}`;
             player.style.display = 'flex';
         }
 
@@ -207,15 +227,17 @@
             player.style.display = 'none';
         }
 
-        // Enregistrement du Service Worker pour la PWA
+        // Enregistrement du Service Worker PWA
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+            navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
-        // Démarrage
-        loadAnime();
-        loadKoreanMovies();
-        loadKoreanDramas();
+        // Lancement au chargement de la page
+        window.onload = () => {
+            loadAnime();
+            loadKoreanMovies();
+            loadKoreanDramas();
+        };
     </script>
 
 </body>
