@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JORVIE MOVIE - Animés & Coréen VF</title>
+    <title>JORVIE MOVIE - Korean Stars & Anime VF</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d0d11">
     <style>
@@ -16,7 +16,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Navigation Style Glassmorphism */
+        /* Navigation Glassmorphism */
         nav {
             display: flex;
             align-items: center;
@@ -44,10 +44,10 @@
             width: 130px;
         }
 
-        /* Banner Carousel en haut */
+        /* Hero Banner Coréenne & Animés */
         .hero {
             position: relative;
-            height: 320px;
+            height: 330px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -58,7 +58,7 @@
         }
         .hero-overlay {
             position: absolute; top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(180deg, rgba(13,13,17,0.2) 0%, rgba(13,13,17,0.85) 75%, #0d0d11 100%);
+            background: linear-gradient(180deg, rgba(13,13,17,0.1) 0%, rgba(13,13,17,0.85) 75%, #0d0d11 100%);
             z-index: 1;
         }
         .hero-content { position: relative; z-index: 2; }
@@ -73,8 +73,8 @@
             margin-bottom: 8px;
             box-shadow: 0 2px 8px rgba(255, 42, 57, 0.4);
         }
-        .hero h2 { font-size: 26px; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        .hero p { font-size: 12px; color: #bbb; margin: 4px 0 16px; }
+        .hero h2 { font-size: 26px; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
+        .hero p { font-size: 12px; color: #ddd; margin: 4px 0 16px; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
         .btn-play {
             background: linear-gradient(135deg, #e50914, #ff2a39);
             color: white;
@@ -95,7 +95,7 @@
         .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s; }
         .dot.active { background: #ff2a39; width: 18px; border-radius: 10px; }
 
-        /* Sections & Grilles horizontales */
+        /* Catalogues */
         .section { margin-top: 24px; padding: 0 16px; }
         .section-title { font-size: 16px; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
         .section-title::before { content: ''; width: 4px; height: 16px; background: #ff2a39; border-radius: 2px; box-shadow: 0 0 8px #ff2a39; }
@@ -109,10 +109,10 @@
         }
         .row::-webkit-scrollbar { display: none; }
 
-        /* Cartes d'affichage avec contours translucides */
+        /* Cartes translucides */
         .card {
-            min-width: 125px;
-            width: 125px;
+            min-width: 130px;
+            width: 130px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
@@ -126,7 +126,7 @@
         .card:active { transform: scale(0.95); }
         .card-img-wrapper {
             width: 100%;
-            height: 175px;
+            height: 180px;
             background: #181822;
             position: relative;
         }
@@ -146,7 +146,7 @@
         .card-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
         .card-sub { font-size: 10px; color: #888; margin-top: 2px; }
 
-        /* Lecteur Vidéo & Modale Pub */
+        /* Modale Lecteur Vidéo */
         #player-modal {
             display: none;
             position: fixed;
@@ -177,7 +177,7 @@
         }
         video { width: 100%; max-height: 100%; outline: none; background: #000; }
 
-        /* Overlay Publicité 5s */
+        /* Publicité 5s */
         #ad-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -210,13 +210,13 @@
         </div>
     </nav>
 
-    <!-- Bannière Haute Dynamique Rotative -->
+    <!-- Bannière Haute Dynamique -->
     <div class="hero" id="hero-banner">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <span class="hero-badge" id="hero-badge">🔥 TENDANCE MANGA</span>
-            <h2 id="hero-title">Solo Leveling</h2>
-            <p id="hero-desc">Série d'action et fantasy coréenne (VF Intégrale).</p>
+            <span class="hero-badge" id="hero-badge">🇰🇷 BTS & K-DRAMA</span>
+            <h2 id="hero-title">Business Proposal</h2>
+            <p id="hero-desc">Série romantique coréenne incontournable (VF).</p>
             <button class="btn-play" onclick="playCurrentHero()">
                 ▶ REGARDER EN VF
             </button>
@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <!-- Modale Lecteur Vidéo avec Pub -->
+    <!-- Modale Lecteur Vidéo -->
     <div id="player-modal">
         <div class="player-header">
             <span class="player-title" id="playing-title">Lecture vidéo</span>
@@ -242,61 +242,60 @@
                     <p>Chargement de votre vidéo en version française (VF)...</p>
                 </div>
             </div>
-            <video id="local-player" controls playsinline webkit-playsinline preload="metadata">
+            <video id="local-player" controls playsinline webkit-playsinline preload="auto">
                 <source id="video-source" src="" type="video/mp4">
-                Votre navigateur ne supporte pas la lecture vidéo.
             </video>
         </div>
     </div>
 
-    <!-- Catalogues Exclusifs : Animés Romance/Action & Dramas Coréens -->
+    <!-- Sections Exclusives -->
     <div class="section">
-        <div class="section-title">⚔️ Animés Action (VF)</div>
+        <div class="section-title">🇰🇷 Acteurs & Stars Coréens</div>
+        <div class="row" id="korean-stars-row"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🌸 Dramas Coréens Romance (VF)</div>
+        <div class="row" id="dramas-romance-row"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">⚔️ Animés Action & Fantasy (VF)</div>
         <div class="row" id="anime-action-row"></div>
     </div>
 
     <div class="section">
-        <div class="section-title">🌸 Animés Romance (VF)</div>
+        <div class="section-title">💖 Animés Romance (VF)</div>
         <div class="row" id="anime-romance-row"></div>
     </div>
 
-    <div class="section">
-        <div class="section-title">🌟 K-POP & Stars Coréennes</div>
-        <div class="row" id="kpop-row"></div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">🇰🇷 Films & Dramas Coréens (VF)</div>
-        <div class="row" id="dramas-row"></div>
-    </div>
-
     <script>
-        // Liens vidéo MP4 publics universels (compatibles Safari & Android)
-        const videoSample1 = "https://vjs.zencdn.net/v/oceans.mp4";
-        const videoSample2 = "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+        // Liens vidéo universels très stables (MP4 H.264)
+        const videoStream1 = "https://vjs.zencdn.net/v/oceans.mp4";
+        const videoStream2 = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
 
-        // Bannière haute dynamique
+        // Bannière dynamique avec visuels Coréens et Animés
         const bannerItems = [
+            {
+                title: 'Business Proposal',
+                badge: '🇰🇷 K-DRAMA ROMANCE',
+                desc: 'La comédie romantique coréenne la plus regardée (VF).',
+                img: 'https://static.tvmaze.com/uploads/images/medium_portrait/398/996321.jpg',
+                video: videoStream1
+            },
             {
                 title: 'Solo Leveling',
                 badge: '⚔️ ACTION MANGA',
-                desc: 'Série d\'action et fantasy coréenne (VF Intégrale).',
-                img: 'https://image.tmdb.org/t/p/w780/9cqA622A3O48386O2X32822O.jpg',
-                video: videoSample1
+                desc: 'L\'animé d\'action coréen numéro 1 dans le monde (VF).',
+                img: 'https://static.tvmaze.com/uploads/images/medium_portrait/502/1255836.jpg',
+                video: videoStream2
             },
             {
-                title: 'K-Drama Romance',
-                badge: '💖 DRAMA POPULAIRE',
-                desc: 'L\'histoire d\'amour coréenne la plus regardée (VF).',
-                img: 'https://image.tmdb.org/t/p/w780/7e3B2M1aD9N7kS4Q.jpg',
-                video: videoSample2
-            },
-            {
-                title: 'Demon Slayer',
-                badge: '🔥 ANIMÉ CULTE',
-                desc: 'Le combat épique de Tanjiro contre les démons (VF).',
-                img: 'https://image.tmdb.org/t/p/w780/d3f78mJ1B9lR8g9e1x.jpg',
-                video: videoSample1
+                title: 'Squid Game',
+                badge: '🔥 DRAMA CORÉEN',
+                desc: 'Le phénomène mondial coréen (VF Intégrale).',
+                img: 'https://static.tvmaze.com/uploads/images/medium_portrait/356/892225.jpg',
+                video: videoStream1
             }
         ];
 
@@ -305,7 +304,7 @@
         function updateHeroBanner() {
             const current = bannerItems[currentBannerIndex];
             const heroEl = document.getElementById('hero-banner');
-            heroEl.style.backgroundImage = `url('${current.img}'), url('${getSVGPlaceholder(current.title)}')`;
+            heroEl.style.backgroundImage = `url('${current.img}')`;
             document.getElementById('hero-badge').innerText = current.badge;
             document.getElementById('hero-title').innerText = current.title;
             document.getElementById('hero-desc').innerText = current.desc;
@@ -327,39 +326,38 @@
             playMedia(current.title, current.video);
         }
 
+        // Section Stars & Idols Coréens
+        const koreanStarsData = [
+            { title: 'Cha Eun-woo', sub: 'K-Drama Idol', tag: 'STAR', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/398/996321.jpg', video: videoStream1 },
+            { title: 'Song Kang', sub: 'My Demon', tag: 'STAR', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/356/892225.jpg', video: videoStream2 },
+            { title: 'BTS - World Tour', sub: 'Concert • VF', tag: 'K-POP', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/234/585642.jpg', video: videoStream1 },
+            { title: 'Park Seo-joon', sub: 'Itaewon Class', tag: 'ACTEUR', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/394/985558.jpg', video: videoStream2 }
+        ];
+
+        // Dramas Coréens
+        const dramasRomanceData = [
+            { title: 'Business Proposal', sub: 'Saison 1 • VF', tag: 'VF HD', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/398/996321.jpg', video: videoStream1 },
+            { title: 'Crash Landing on You', sub: 'Romance • VF', tag: 'VF 4K', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/234/585642.jpg', video: videoStream2 },
+            { title: 'Squid Game', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/356/892225.jpg', video: videoStream1 },
+            { title: 'All of Us Are Dead', sub: 'Horreur • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/394/985558.jpg', video: videoStream2 }
+        ];
+
         // Animés Action
         const animeActionData = [
-            { title: 'Solo Leveling', sub: 'Saison 1 • VF', tag: 'VF 4K', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/502/1255836.jpg', video: videoSample1 },
-            { title: 'Demon Slayer', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/498/1245458.jpg', video: videoSample2 },
-            { title: 'Jujutsu Kaisen', sub: 'Saison 2 • VF', tag: 'VF HD', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/470/1175488.jpg', video: videoSample1 },
-            { title: 'Attack on Titan', sub: 'Saison Finale • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/440/1101235.jpg', video: videoSample2 }
+            { title: 'Solo Leveling', sub: 'Saison 1 • VF', tag: 'VF 4K', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/502/1255836.jpg', video: videoStream1 },
+            { title: 'Demon Slayer', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/498/1245458.jpg', video: videoStream2 },
+            { title: 'Jujutsu Kaisen', sub: 'Saison 2 • VF', tag: 'VF HD', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/470/1175488.jpg', video: videoStream1 }
         ];
 
         // Animés Romance
         const animeRomanceData = [
-            { title: 'Kaguya-sama', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/405/1013401.jpg', video: videoSample1 },
-            { title: 'Horimiya', sub: 'Saison 1 • VF', tag: 'VF HD', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/291/728989.jpg', video: videoSample2 },
-            { title: 'My Dress-Up Darling', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/394/985550.jpg', video: videoSample1 }
+            { title: 'Kaguya-sama', sub: 'Romance • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/405/1013401.jpg', video: videoStream1 },
+            { title: 'Horimiya', sub: 'Romance • VF', tag: 'VF HD', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/291/728989.jpg', video: videoStream2 },
+            { title: 'My Dress-Up Darling', sub: 'Romance • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/394/985550.jpg', video: videoStream1 }
         ];
 
-        // Stars Coréennes & K-Pop
-        const kpopData = [
-            { title: 'BTS World Tour', sub: 'Concert • VF', tag: '4K', img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80', video: videoSample1 },
-            { title: 'BLACKPINK Live', sub: 'Showcase • VF', tag: 'HD', img: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&q=80', video: videoSample2 },
-            { title: 'Cha Eun-woo Fanmeet', sub: 'Événement • VF', tag: 'HD', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80', video: videoSample1 }
-        ];
-
-        // Films & Dramas Coréens
-        const dramaData = [
-            { title: 'Squid Game', sub: 'Saison 1 • VF', tag: 'VF 4K', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/356/892225.jpg', video: videoSample1 },
-            { title: 'All of Us Are Dead', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/394/985558.jpg', video: videoSample2 },
-            { title: 'Business Proposal', sub: 'Romance • VF', tag: 'VF HD', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/398/996321.jpg', video: videoSample1 },
-            { title: 'Crash Landing on You', sub: 'Drama Romance • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/234/585642.jpg', video: videoSample2 }
-        ];
-
-        // Affiche SVG stylisée si l'image est indisponible
         function getSVGPlaceholder(title) {
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="125" height="175" viewBox="0 0 125 175"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="45%" fill="#ff2a39" font-family="sans-serif" font-weight="900" font-size="28" text-anchor="middle">🎬</text><text x="50%" y="70%" fill="#ffffff" font-family="sans-serif" font-weight="bold" font-size="10" text-anchor="middle">${title}</text></svg>`;
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="130" height="180" viewBox="0 0 130 180"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="45%" fill="#ff2a39" font-family="sans-serif" font-weight="900" font-size="28" text-anchor="middle">🎬</text><text x="50%" y="70%" fill="#ffffff" font-family="sans-serif" font-weight="bold" font-size="10" text-anchor="middle">${title}</text></svg>`;
             return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
         }
 
@@ -431,18 +429,18 @@
         function filterCatalog() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filter = list => list.filter(item => item.title.toLowerCase().includes(query));
+            renderRow(filter(koreanStarsData), 'korean-stars-row');
+            renderRow(filter(dramasRomanceData), 'dramas-romance-row');
             renderRow(filter(animeActionData), 'anime-action-row');
             renderRow(filter(animeRomanceData), 'anime-romance-row');
-            renderRow(filter(kpopData), 'kpop-row');
-            renderRow(filter(dramaData), 'dramas-row');
         }
 
         window.onload = () => {
             updateHeroBanner();
+            renderRow(koreanStarsData, 'korean-stars-row');
+            renderRow(dramasRomanceData, 'dramas-romance-row');
             renderRow(animeActionData, 'anime-action-row');
             renderRow(animeRomanceData, 'anime-romance-row');
-            renderRow(kpopData, 'kpop-row');
-            renderRow(dramaData, 'dramas-row');
         };
     </script>
 </body>
