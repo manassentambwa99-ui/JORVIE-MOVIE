@@ -3,92 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JORVIE MOVIE - VF</title>
+    <title>JORVIE MOVIE</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f0f12">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: #0d0d11; color: #ffffff; padding-bottom: 60px; user-select: none; }
+        body { 
+            background: #0f0f12; 
+            color: #ffffff; 
+            padding-bottom: 60px; 
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
+        /* Glassmorphism Navigation Bar */
         nav {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px; background: rgba(18, 18, 24, 0.9);
-            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(18, 18, 24, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .logo { font-size: 18px; font-weight: 900; color: #ff2a39; letter-spacing: 0.8px; }
+        .logo { font-size: 18px; font-weight: 900; color: #ff2a39; letter-spacing: 0.8px; text-shadow: 0 0 12px rgba(255, 42, 57, 0.4); }
+        .search-box input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            outline: none;
+            width: 140px;
+        }
 
-        /* Banner Hero avec Vraie Affiche */
+        /* Hero Banner Style MovieBox */
         .hero {
-            position: relative; height: 320px;
-            background: linear-gradient(180deg, rgba(13,13,17,0.1) 0%, rgba(13,13,17,0.95) 85%, #0d0d11 100%), 
-                        url('https://image.tmdb.org/t/p/w780/z1P234567.jpg') center/cover no-repeat;
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 20px 16px;
+            position: relative;
+            height: 320px;
+            background: linear-gradient(180deg, rgba(15,15,18,0.2) 0%, rgba(15,15,18,0.9) 80%, #0f0f12 100%), url('https://static.tvmaze.com/uploads/images/original_untouched/502/1255836.jpg') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px 16px;
         }
-        .hero-badge { background: #ff2a39; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 4px; width: fit-content; margin-bottom: 6px; }
-        .hero h2 { font-size: 24px; font-weight: 900; }
-        .hero p { font-size: 12px; color: #ccc; margin: 4px 0 14px; }
-        .btn-play { background: #e50914; color: white; border: none; padding: 10px 22px; font-size: 13px; font-weight: bold; border-radius: 20px; cursor: pointer; width: fit-content; }
+        .hero-badge { 
+            background: linear-gradient(135deg, #ff2a39, #ff5252); 
+            color: #fff; 
+            font-size: 10px; 
+            font-weight: 800; 
+            padding: 4px 10px; 
+            border-radius: 6px; 
+            width: fit-content; 
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(255, 42, 57, 0.4);
+        }
+        .hero h2 { font-size: 26px; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .hero p { font-size: 12px; color: #bbb; margin: 4px 0 16px; }
+        .btn-play {
+            background: linear-gradient(135deg, #e50914, #ff2a39);
+            color: white;
+            border: none;
+            padding: 11px 24px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.5);
+            width: fit-content;
+        }
 
-        /* Carrousels */
-        .section { margin-top: 20px; padding: 0 16px; }
-        .section-title { font-size: 15px; font-weight: 800; margin-bottom: 12px; border-left: 3px solid #ff2a39; padding-left: 8px; }
-        .row { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 8px; scrollbar-width: none; }
+        /* Sections & Grid Horizon */
+        .section { margin-top: 24px; padding: 0 16px; }
+        .section-title { font-size: 16px; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .section-title::before { content: ''; width: 4px; height: 16px; background: #ff2a39; border-radius: 2px; }
+        
+        .row {
+            display: flex;
+            overflow-x: auto;
+            gap: 14px;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
         .row::-webkit-scrollbar { display: none; }
 
-        /* Cartes de films avec vraies affiches TMDB */
-        .card { min-width: 120px; width: 120px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; overflow: hidden; flex-shrink: 0; cursor: pointer; }
-        .card-img-wrapper { width: 100%; height: 170px; background: #1a1a24; position: relative; }
+        /* Cartes de films avec bordures translucides */
+        .card {
+            min-width: 125px;
+            width: 125px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        .card-img-wrapper {
+            width: 100%;
+            height: 175px;
+            background: #1a1a22;
+            position: relative;
+        }
         .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .card-tag { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.8); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 4px; }
-        .card-info { padding: 6px; }
-        .card-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-        .card-sub { font-size: 9px; color: #888; margin-top: 2px; }
+        .card-tag { 
+            position: absolute; top: 6px; right: 6px; 
+            background: rgba(0, 0, 0, 0.75); color: #fff; 
+            font-size: 9px; font-weight: 800; padding: 3px 6px; 
+            border-radius: 5px; backdrop-filter: blur(6px);
+        }
+        .card-info { padding: 8px 8px 10px; }
+        .card-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .card-sub { font-size: 10px; color: #888; margin-top: 2px; }
 
-        /* Lecteur Vidéo + Overlay Publicité */
-        #player-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; flex-direction: column; }
-        .player-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #14141a; }
-        .player-title { font-size: 13px; font-weight: bold; }
-        .close-btn { background: #ff2a39; color: #fff; border: none; padding: 6px 14px; border-radius: 14px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .video-container { width: 100%; height: calc(100% - 48px); display: flex; align-items: center; justify-content: center; position: relative; }
-        video { width: 100%; max-height: 100%; }
+        /* Lecteur Vidéo & Écran de Publicité Interne */
+        #player-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            flex-direction: column;
+        }
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            background: rgba(20, 20, 26, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .player-title { font-size: 14px; font-weight: 800; color: #fff; }
+        .close-btn {
+            background: #ff2a39; color: #fff; border: none; 
+            padding: 7px 16px; border-radius: 20px; 
+            font-size: 12px; font-weight: bold; cursor: pointer;
+        }
+        .video-container {
+            width: 100%; height: calc(100% - 55px);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        video { width: 100%; max-height: 100%; outline: none; }
 
-        #ad-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0d0d11; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
-        .ad-timer { position: absolute; top: 16px; right: 16px; background: #ff2a39; color: #fff; padding: 5px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-        .ad-box { text-align: center; padding: 20px; }
-        .ad-box h3 { color: #ff2a39; font-size: 18px; margin-bottom: 6px; }
-        .ad-box p { color: #aaa; font-size: 12px; }
+        /* Écran de Publicité Intégré */
+        #ad-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .ad-timer-badge {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255, 42, 57, 0.9);
+            color: #fff; padding: 8px 16px;
+            border-radius: 20px; font-size: 12px; font-weight: bold;
+        }
+        .ad-content { text-align: center; padding: 20px; }
+        .ad-content h3 { font-size: 20px; margin-bottom: 10px; color: #ff2a39; }
+        .ad-content p { font-size: 13px; color: #aaa; }
     </style>
 </head>
 <body>
 
     <nav>
         <div class="logo">JORVIE MOVIE</div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher VF..." onkeyup="filterCatalog()">
+        </div>
     </nav>
 
     <div class="hero">
-        <span class="hero-badge">🔥 VF DISPONIBLE</span>
+        <span class="hero-badge">🔥 TENDANCE VF</span>
         <h2>Solo Leveling</h2>
-        <p>Série d'action et fantasy (Épisode complet en VF).</p>
-        <button class="btn-play" onclick="playMedia('Solo Leveling (VF)', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">▶ REGARDER</button>
+        <p>Série d'action et fantasy coréenne (VF Intégrale).</p>
+        <button class="btn-play" onclick="startMedia('Solo Leveling (VF)', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4')">
+            ▶ REGARDER
+        </button>
     </div>
 
+    <!-- Lecteur Vidéo Local / Modale avec Pub -->
     <div id="player-modal">
         <div class="player-header">
-            <span class="player-title" id="playing-title">Lecture</span>
+            <span class="player-title" id="playing-title">Lecture vidéo</span>
             <button class="close-btn" onclick="closePlayer()">✕ Fermer</button>
         </div>
         <div class="video-container">
+            <!-- Overlay Publicité 5s -->
             <div id="ad-overlay">
-                <div class="ad-timer" id="ad-timer">Publicité : 5s</div>
-                <div class="ad-box">
-                    <h3>JORVIE MOVIE</h3>
-                    <p>Lancement de la vidéo après la publicité...</p>
+                <div class="ad-timer-badge" id="ad-timer">Publicité: 5s</div>
+                <div class="ad-content">
+                    <h3>JORVIE MOVIE SPONSOR</h3>
+                    <p>Votre film commence immédiatement après cette courte annonce...</p>
                 </div>
             </div>
-            <video id="local-player" controls playsinline>
+
+            <!-- Lecteur Vidéo Direct -->
+            <video id="local-player" controls controlsList="nodownload" playsinline>
                 <source id="video-source" src="" type="video/mp4">
             </video>
         </div>
     </div>
 
+    <!-- Sections de films et d'animés -->
     <div class="section">
         <div class="section-title">🔥 Animés Populaires (VF)</div>
         <div class="row" id="anime-row"></div>
@@ -99,20 +227,37 @@
         <div class="row" id="movies-row"></div>
     </div>
 
+    <div class="section">
+        <div class="section-title">📺 Dramas Coréens (VF)</div>
+        <div class="row" id="dramas-row"></div>
+    </div>
+
     <script>
-        // Utilisation des vraies affiches officielles (CDN TMDB sécurisé)
+        // Catalogues avec liens d'affiches officielles vérifiés
         const animeData = [
-            { title: 'Solo Leveling', sub: 'Épisode 1 • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w500/1p55S2L6O39A1uO7q3A5aI6n8A.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
-            { title: 'Demon Slayer', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w500/xUfRQA2V432rm3pP4P3A41344.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
-            { title: 'Arcane', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w500/fqld221f2A332612.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
-            { title: 'One Piece', sub: 'Arc Wano • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w500/cMD9Y21RAnR33P9R3S331aC2.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' }
+            { title: 'Solo Leveling', sub: 'Épisode 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/502/1255836.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
+            { title: 'Demon Slayer', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/498/1245458.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' },
+            { title: 'Arcane', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/535/1339188.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
+            { title: 'One Piece', sub: 'Arc Wano • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/206/517226.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4' }
         ];
 
         const movieData = [
-            { title: 'Dernier Train pour Busan', sub: 'Film • VF', tag: 'VF HD', img: 'https://image.tmdb.org/t/p/w500/m990d0M58R7E4mKkS2G0u01l3b1.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
-            { title: 'Parasite', sub: 'Film • VF', tag: 'VF HD', img: 'https://image.tmdb.org/t/p/w500/7IiT21235123.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' },
-            { title: 'The Host', sub: 'Film • VF', tag: 'VF', img: 'https://image.tmdb.org/t/p/w500/1I9f0m76q63eP6g6A763E48R35.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' }
+            { title: 'Dernier Train pour Busan', sub: 'Film • VF', tag: 'VF HD', img: 'https://upload.wikimedia.org/wikipedia/en/9/95/Train_to_Busan.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
+            { title: 'Parasite', sub: 'Film • VF', tag: 'VF HD', img: 'https://upload.wikimedia.org/wikipedia/en/5/53/Parasite_%282019_film%29.png', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' },
+            { title: 'The Host', sub: 'Film • VF', tag: 'VF', img: 'https://upload.wikimedia.org/wikipedia/en/0/03/The_Host_poster.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' }
         ];
+
+        const dramaData = [
+            { title: 'Squid Game', sub: 'Saison 1 • VF', tag: 'VF 4K', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/356/892225.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoynies.mp4' },
+            { title: 'All of Us Are Dead', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/394/985558.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4' },
+            { title: 'Goblin', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/88/221975.jpg', video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' }
+        ];
+
+        // Générateur d'affiche alternative dynamique en SVG si un problème de réseau survient
+        function getSVGPlaceholder(title) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="125" height="175" viewBox="0 0 125 175"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="45%" fill="#ff2a39" font-family="sans-serif" font-weight="900" font-size="24" text-anchor="middle">🎬</text><text x="50%" y="70%" fill="#ffffff" font-family="sans-serif" font-weight="bold" font-size="10" text-anchor="middle">${title}</text></svg>`;
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }
 
         function renderRow(list, containerId) {
             const container = document.getElementById(containerId);
@@ -120,12 +265,14 @@
             list.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.onclick = () => playMedia(item.title, item.video);
+                card.onclick = () => startMedia(item.title, item.video);
                 
+                const fallbackImg = getSVGPlaceholder(item.title);
+
                 card.innerHTML = `
                     <div class="card-img-wrapper">
                         <span class="card-tag">${item.tag}</span>
-                        <img src="${item.img}" alt="${item.title}" loading="lazy" crossorigin="anonymous">
+                        <img src="${item.img}" alt="${item.title}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImg}';">
                     </div>
                     <div class="card-info">
                         <div class="card-title">${item.title}</div>
@@ -136,9 +283,9 @@
             });
         }
 
-        let adTimerInterval;
+        let adInterval;
 
-        function playMedia(title, videoUrl) {
+        function startMedia(title, videoUrl) {
             document.getElementById('playing-title').innerText = title;
             const player = document.getElementById('local-player');
             const source = document.getElementById('video-source');
@@ -151,16 +298,16 @@
             adOverlay.style.display = 'flex';
             document.getElementById('player-modal').style.display = 'flex';
 
-            let count = 5;
-            adTimer.innerText = `Publicité : ${count}s`;
+            let timeLeft = 5;
+            adTimer.innerText = `Publicité: ${timeLeft}s`;
 
-            clearInterval(adTimerInterval);
-            adTimerInterval = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    adTimer.innerText = `Publicité : ${count}s`;
+            clearInterval(adInterval);
+            adInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    adTimer.innerText = `Publicité: ${timeLeft}s`;
                 } else {
-                    clearInterval(adTimerInterval);
+                    clearInterval(adInterval);
                     adOverlay.style.display = 'none';
                     player.play();
                 }
@@ -170,13 +317,22 @@
         function closePlayer() {
             const player = document.getElementById('local-player');
             player.pause();
-            clearInterval(adTimerInterval);
+            clearInterval(adInterval);
             document.getElementById('player-modal').style.display = 'none';
+        }
+
+        function filterCatalog() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filter = list => list.filter(item => item.title.toLowerCase().includes(query));
+            renderRow(filter(animeData), 'anime-row');
+            renderRow(filter(movieData), 'movies-row');
+            renderRow(filter(dramaData), 'dramas-row');
         }
 
         window.onload = () => {
             renderRow(animeData, 'anime-row');
             renderRow(movieData, 'movies-row');
+            renderRow(dramaData, 'dramas-row');
         };
     </script>
 </body>
