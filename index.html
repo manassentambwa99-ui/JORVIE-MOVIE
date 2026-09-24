@@ -148,7 +148,7 @@ function placeholder(title) {
 function plain(html) { return new DOMParser().parseFromString(String(html || '').replace(/<br\s*\/?>/gi, ' '), 'text/html').body.textContent.replace(/\s+/g, ' ').trim(); }
 
 /* ================= SOURCE 1 : AniList (animés, sans clé) ================= */
-const AL = 'query($p:Int,$s:String,$sort:[MediaSort],$g:[String],$f:MediaFormat){Page(page:$p,perPage:20){pageInfo{hasNextPage}media(type:ANIME,search:$s,sort:$sort,genre_in:$g,format:$f,isAdult:false){id title{romaji english}coverImage{large}bannerImage description(asHtml:false)averageScore seasonYear episodes format genres trailer{id site}externalLinks{site url type language}}}}';
+const AL = 'query($p:Int,$s:String,$sort:[MediaSort],$g:[String],$f:MediaFormat){Page(page:$p,perPage:20){pageInfo{hasNextPage}media(type:ANIME,search:$s,sort:$sort,genre_in:$g,format:$f,isAdult:false){id idMal title{romaji english}coverImage{large}bannerImage description(asHtml:false)averageScore seasonYear episodes format genres trailer{id site}externalLinks{site url type language}}}}';
 
 async function anilist(vars) {
   const r = await fetch('https://graphql.anilist.co', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ query: AL, variables: vars }) });
@@ -158,7 +158,7 @@ async function anilist(vars) {
 }
 function alItem(m) {
   return {
-    src: 'al', id: 'al' + m.id, title: m.title.english || m.title.romaji, poster: m.coverImage && m.coverImage.large, banner: m.bannerImage,
+    src: 'al', id: 'al' + m.id, mal: m.idMal || 0, title: m.title.english || m.title.romaji, poster: m.coverImage && m.coverImage.large, banner: m.bannerImage,
     year: m.seasonYear || '', score: m.averageScore ? (m.averageScore / 10).toFixed(1) : '', tag: m.format === 'MOVIE' ? 'FILM' : 'ANIMÉ',
     extra: [m.episodes ? m.episodes + ' épisode' + (m.episodes > 1 ? 's' : '') : '', (m.genres || []).slice(0, 3).map(g => GENRES[g] || g).join(', ')].filter(Boolean).join(' • '),
     desc: m.description || '', links: m.externalLinks || [], trailer: m.trailer
@@ -231,10 +231,25 @@ function card(it) {
   el.querySelector('.card-tag').textContent = it.tag;
   el.querySelector('.card-title').textContent = it.title;
   el.querySelector('.card-sub').textContent = [it.year, it.score ? '★ ' + it.score : ''].filter(Boolean).join(' • ') || it.extra;
+  (it.els = it.els || []).push(el);
   el.onclick = () => openDetail(it);
   return el;
 }
 
+const frCheck = {};
+async function frenchify(items) {
+  const list = items.filter(x => x.src === 'al' && x.mal && !frCheck[x.id]);
+  if (!list.length) return;
+  list.forEach(x => { frCheck[x.id] = 1; });
+  try {
+    const rows = await sparql(`SELECT ?mal ?l ?art WHERE { VALUES ?mal { ${list.map(x => '"' + x.mal + '"').join(' ')} } ?f wdt:P4086 ?mal. OPTIONAL { ?f rdfs:label ?l. FILTER(LANG(?l) = "fr") } OPTIONAL { ?art schema:about ?f; schema:isPartOf <https://fr.wikipedia.org/> } }`);
+    rows.forEach(b => {
+      const it = list.find(x => String(x.mal) === b.mal.value); if (!it) return;
+      if (b.l && b.l.value) { it.title = b.l.value; (it.els || []).forEach(e => { e.querySelector('.card-title').textContent = it.title; }); }
+      if (b.art) it.art = b.art.value;
+    });
+  } catch (e) { /* on garde le titre d'origine */ }
+}
 const alRow = vars => async p => { const d = await anilist(Object.assign({ p }, vars)); return { items: d.media.map(alItem).filter(x => x.poster), more: d.pageInfo.hasNextPage }; };
 const ROWS = [
   { t: '⚔️ Animés populaires', load: alRow({ sort: ['POPULARITY_DESC'] }), hero: 1 },
@@ -260,6 +275,7 @@ function buildRow(cfg) {
       const d = await cfg.load(page + 1);
       page++; done = !d.more || page >= 40;
       d.items.forEach(it => { if (!seen[it.id]) { seen[it.id] = 1; row.appendChild(card(it)); } });
+      frenchify(d.items);
       if (cfg.hero && page === 1) {
         d.items.filter(x => x.banner && x.desc).slice(0, 3).forEach(x => heroItems.push(x));
         updateHero();
@@ -319,6 +335,7 @@ async function runSearch(q) {
   for (let i = 0; i < Math.max(anime.length, korean.length); i++) { if (anime[i]) all.push(anime[i]); if (korean[i]) all.push(korean[i]); }
   if (!all.length) { box.innerHTML = `<div class="empty">${failed === 2 ? 'La recherche a échoué. Vérifie ta connexion.' : 'Aucun animé, drama ou film coréen trouvé.'}</div>`; return; }
   all.forEach(it => box.appendChild(card(it)));
+  frenchify(anime);
 }
 
 /* ================= Fiche détaillée ================= */
@@ -351,14 +368,13 @@ async function openDetail(it) {
   // Résumé en français
   let text = '';
   try {
-    if (it.src === 'al') {
-      text = await toFr(plain(it.desc));
-    } else if (it.art) {
+    if (it.art) {
       const t = it.art.split('/wiki/')[1];
       const r = await fetch('https://fr.wikipedia.org/api/rest_v1/page/summary/' + t);
       if (r.ok) text = (await r.json()).extract || '';
     }
   } catch (e) {}
+  if (!text && it.src === 'al') { try { text = await toFr(plain(it.desc)); } catch (e) {} }
   if (!text) text = it.desc || 'Résumé non disponible en français.';
   if (seq === modalSeq && $('syn')) $('syn').textContent = text;
 }
