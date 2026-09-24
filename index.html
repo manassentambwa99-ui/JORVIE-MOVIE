@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+here<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -70,6 +70,11 @@ video.frame { max-height: 60vh; }
 .mine-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.1); font-size: 12px; }
 .mine-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 .mine-item .btn { padding: 6px 12px; font-size: 11px; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 14px 16px 0; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip2 { flex-shrink: 0; padding: 7px 14px; border-radius: 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.chip2:active { transform: scale(.95); }
+.mine-item .nm { font-size: 12px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 footer { margin: 28px 16px 0; font-size: 10px; color: #7d7d8c; line-height: 1.5; text-align: center; }
 </style>
 </head>
@@ -80,6 +85,7 @@ footer { margin: 28px 16px 0; font-size: 10px; color: #7d7d8c; line-height: 1.5;
   <div class="logo-box"><div class="logo-icon">J</div><div class="logo">JORVIE MOVIE</div></div>
   <div class="search-box"><input type="text" id="searchInput" placeholder="Recherche VF..." autocomplete="off"></div>
 </nav>
+<div class="chips" id="chips"></div>
 
 <div id="home">
   <div class="hero" id="hero-banner">
@@ -101,15 +107,22 @@ footer { margin: 28px 16px 0; font-size: 10px; color: #7d7d8c; line-height: 1.5;
 </div>
 
 <div class="mine glass">
-  <b style="font-size:15px">📁 Mes vidéos</b>
-  <p class="empty">Ajoute uniquement des vidéos que tu possèdes ou qui sont libres de droits. Tu peux les lire et les télécharger ici.</p>
+  <b style="font-size:15px">📁 Ma bibliothèque hors ligne</b>
+  <p class="empty">Ajoute des vidéos que tu possèdes ou qui sont libres de droits. Elles sont enregistrées dans l'application et se lisent sans connexion, avec leur saison et leur épisode.</p>
+  <input class="field" id="nameInput" placeholder="Titre" autocomplete="off">
+  <div style="display:flex;gap:8px">
+    <input class="field" id="seasonInput" type="number" min="1" inputmode="numeric" placeholder="Saison">
+    <input class="field" id="epInput" type="number" min="1" inputmode="numeric" placeholder="Épisode">
+  </div>
   <input class="field" id="urlInput" placeholder="Lien direct d'une vidéo (.mp4)" autocomplete="off">
   <div class="actions">
     <button class="btn alt" onclick="addUrl()">＋ Ajouter le lien</button>
-    <button class="btn alt" onclick="document.getElementById('fileInput').click()">📂 Choisir un fichier</button>
+    <button class="btn alt" onclick="document.getElementById('fileInput').click()">📂 Fichier du téléphone</button>
     <input type="file" id="fileInput" accept="video/*" style="display:none" onchange="addFile(this)">
   </div>
+  <p class="err" id="mine-msg"></p>
   <div id="mine-list"></div>
+  <p class="empty" id="mine-space"></p>
 </div>
 
 <footer>Données : AniList (animés), Wikidata et Wikipédia FR (dramas et films coréens), traduction MyMemory. Les épisodes se regardent sur les plateformes officielles indiquées dans chaque fiche.</footer>
@@ -124,6 +137,9 @@ const enc = encodeURIComponent;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 const GENRES = { Action: 'Action', Adventure: 'Aventure', Comedy: 'Comédie', Drama: 'Drame', Fantasy: 'Fantastique', Horror: 'Horreur', Mystery: 'Mystère', Romance: 'Romance', 'Sci-Fi': 'Science-fiction', 'Slice of Life': 'Tranche de vie', Sports: 'Sport', Supernatural: 'Surnaturel', Thriller: 'Thriller', Psychological: 'Psychologique', Music: 'Musique', 'Mahou Shoujo': 'Magical girl', Ecchi: 'Ecchi' };
+
+const FR_GENRES = { 'action': 'Action', 'aventure': 'Adventure', 'comédie': 'Comedy', 'comedie': 'Comedy', 'drame': 'Drama', 'fantastique': 'Fantasy', 'fantasy': 'Fantasy', 'horreur': 'Horror', 'mystère': 'Mystery', 'mystere': 'Mystery', 'romance': 'Romance', 'romantique': 'Romance', 'amour': 'Romance', 'science-fiction': 'Sci-Fi', 'science fiction': 'Sci-Fi', 'sf': 'Sci-Fi', 'tranche de vie': 'Slice of Life', 'sport': 'Sports', 'surnaturel': 'Supernatural', 'thriller': 'Thriller', 'psychologique': 'Psychological', 'musique': 'Music', 'magical girl': 'Mahou Shoujo' };
+const genreOf = q => FR_GENRES[q.toLowerCase().trim()] || '';
 
 function placeholder(title) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="130" height="180" viewBox="0 0 130 180"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="48%" font-size="34" text-anchor="middle">🎬</text><text x="50%" y="72%" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="10" text-anchor="middle">${esc(title).slice(0, 22)}</text></svg>`;
@@ -151,7 +167,7 @@ function alItem(m) {
 
 /* ================= SOURCE 2 : Wikidata + Wikipédia FR (dramas et films coréens, sans clé) ================= */
 const Q_FILM = 'Q11424', Q_SERIES = 'Q5398426';
-const wdQ = (head, tail) => `SELECT ?f ?fLabel ?fDescription ?cls ?img ?date ?s ?art WHERE { ${head} ?f wdt:P31 ?cls; wdt:P495 wd:Q884; wikibase:sitelinks ?s; wdt:P3383|wdt:P18 ?img. OPTIONAL { ?f wdt:P577|wdt:P580 ?date } OPTIONAL { ?art schema:about ?f; schema:isPartOf <https://fr.wikipedia.org/> } SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en,ko". } } ORDER BY DESC(?s) ${tail}`;
+const wdQ = (head, tail) => `SELECT ?f ?fLabel ?fDescription ?cls ?img ?date ?s ?art ?yt WHERE { ${head} ?f wdt:P31 ?cls; wdt:P495 wd:Q884; wikibase:sitelinks ?s; wdt:P3383|wdt:P18 ?img. OPTIONAL { ?f wdt:P577|wdt:P580 ?date } OPTIONAL { ?art schema:about ?f; schema:isPartOf <https://fr.wikipedia.org/> } OPTIONAL { ?f wdt:P1651 ?yt } SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en,ko". } } ORDER BY DESC(?s) ${tail}`;
 
 async function sparql(q) {
   const r = await fetch('https://query.wikidata.org/sparql?format=json&query=' + enc(q));
@@ -162,14 +178,14 @@ function wdItems(rows) {
   const seen = {}, out = [];
   rows.forEach(b => {
     const id = b.f.value.split('/').pop(), title = b.fLabel && b.fLabel.value;
-    if (seen[id] || !title || /^Q\d+$/.test(title)) return;
-    seen[id] = 1;
+    if (seen[id]) { if (b.yt && !seen[id].yt) seen[id].yt = b.yt.value; return; }
+    if (!title || /^Q\d+$/.test(title)) return;
     const isFilm = b.cls.value.endsWith(Q_FILM);
-    out.push({
+    out.push(seen[id] = {
       src: 'wd', id, title, poster: b.img.value.replace(/^http:/, 'https:') + '?width=320',
       year: b.date ? b.date.value.slice(0, 4) : '', score: '', tag: isFilm ? 'FILM' : 'K-DRAMA',
       extra: isFilm ? 'Film coréen' : 'Drama coréen',
-      desc: b.fDescription ? b.fDescription.value : '', art: b.art ? b.art.value : ''
+      desc: b.fDescription ? b.fDescription.value : '', art: b.art ? b.art.value : '', yt: b.yt ? b.yt.value : ''
     });
   });
   return out;
@@ -294,8 +310,8 @@ async function runSearch(q) {
   box.innerHTML = '<div class="empty">Recherche en cours…</div>';
   let failed = 0;
   const [anime, korean] = await Promise.all([
-    anilist({ p: 1, s: q, sort: ['SEARCH_MATCH'] }).then(d => d.media.map(alItem).filter(x => x.poster)).catch(() => { failed++; return []; }),
-    wdSearch(q).catch(() => { failed++; return []; })
+    anilist(genreOf(q) ? { p: 1, g: [genreOf(q)], sort: ['POPULARITY_DESC'] } : { p: 1, s: q, sort: ['SEARCH_MATCH'] }).then(d => d.media.map(alItem).filter(x => x.poster)).catch(() => { failed++; return []; }),
+    (genreOf(q) ? Promise.resolve([]) : wdSearch(q)).catch(() => { failed++; return []; })
   ]);
   if (seq !== searchSeq) return;
   box.innerHTML = '';
@@ -308,7 +324,7 @@ async function runSearch(q) {
 /* ================= Fiche détaillée ================= */
 let modalSeq = 0;
 function showModal(html) { modalSeq++; $('modal-body').innerHTML = html; $('modal').style.display = 'flex'; return modalSeq; }
-function closeModal() { modalSeq++; $('modal-body').innerHTML = ''; $('modal').style.display = 'none'; }
+function closeModal() { if (curObj) { URL.revokeObjectURL(curObj); curObj = null; } modalSeq++; $('modal-body').innerHTML = ''; $('modal').style.display = 'none'; }
 
 function link(box, label, href) { const a = document.createElement('a'); a.className = 'btn alt'; a.textContent = label; a.href = href; a.target = '_blank'; a.rel = 'noopener'; box.appendChild(a); }
 
@@ -320,12 +336,11 @@ async function openDetail(it) {
   body.querySelector('.meta').textContent = [it.tag, it.year, it.score ? '★ ' + it.score : '', it.extra].filter(Boolean).join(' • ');
 
   const acts = $('acts'), watch = $('watch');
-  if (it.src === 'al' && it.trailer && it.trailer.site === 'youtube') {
+  const tid = it.src === 'al' ? (it.trailer && it.trailer.site === 'youtube' ? it.trailer.id : '') : (it.yt || '');
+  if (tid) {
     const b = document.createElement('button'); b.className = 'btn'; b.textContent = '▶ Bande-annonce';
-    b.onclick = () => { $('trailer').innerHTML = `<iframe class="frame" src="https://www.youtube.com/embed/${enc(it.trailer.id)}?autoplay=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`; };
+    b.onclick = () => { $('trailer').innerHTML = `<iframe class="frame" src="https://www.youtube.com/embed/${enc(tid)}?autoplay=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`; };
     acts.appendChild(b);
-  } else {
-    link(acts, '▶ Bande-annonce (YouTube)', 'https://www.youtube.com/results?search_query=' + enc(it.title + ' bande annonce vf'));
   }
   if (it.src === 'al') {
     const seen = {};
@@ -348,47 +363,169 @@ async function openDetail(it) {
   if (seq === modalSeq && $('syn')) $('syn').textContent = text;
 }
 
-/* ================= Mes vidéos (lecture + téléchargement) ================= */
-let mine = [];
-try { mine = JSON.parse(store.get('jm_mine') || '[]'); } catch (e) { mine = []; }
-const session = [];
+/* ================= Bibliothèque hors ligne (lecture + téléchargement dans l'application) ================= */
+const IDB = {
+  db: null,
+  open() {
+    if (this.db) return Promise.resolve(this.db);
+    return new Promise((res, rej) => {
+      if (!window.indexedDB) return rej(new Error('idb'));
+      const r = indexedDB.open('jorvie', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('vids');
+      r.onsuccess = () => { this.db = r.result; res(r.result); };
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async run(mode, fn) {
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const t = db.transaction('vids', mode);
+      const rq = fn(t.objectStore('vids'));
+      t.oncomplete = () => res(rq.result);
+      t.onerror = t.onabort = () => rej(t.error);
+    });
+  },
+  put(k, b) { return this.run('readwrite', s => s.put(b, k)); },
+  get(k) { return this.run('readonly', s => s.get(k)); },
+  del(k) { return this.run('readwrite', s => s.delete(k)); }
+};
+
+let lib = [];
+try { lib = JSON.parse(store.get('jm_lib') || '[]'); } catch (e) { lib = []; }
+const saveLib = () => store.set('jm_lib', JSON.stringify(lib));
+const busy = {}, errs = {};
+let curObj = null;
+const fmtSize = b => b >= 1e9 ? (b / 1e9).toFixed(2) + ' Go' : (b / 1e6).toFixed(1) + ' Mo';
+const newId = () => 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const labelOf = v => v.name + (v.season || v.ep ? ' — ' + (v.season ? 'Saison ' + v.season : '') + (v.season && v.ep ? ', ' : '') + (v.ep ? 'Épisode ' + v.ep : '') : '');
+const fields = () => ({ season: +$('seasonInput').value || '', ep: +$('epInput').value || '' });
+const clearFields = () => { ['nameInput', 'seasonInput', 'epInput', 'urlInput'].forEach(i => { $(i).value = ''; }); $('mine-msg').textContent = ''; };
+
+async function fetchBlob(url, onp) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(r.status);
+  const total = +r.headers.get('content-length') || 0;
+  if (!r.body || !total) { const b = await r.blob(); onp(1); return b; }
+  const rd = r.body.getReader(), chunks = [];
+  let got = 0;
+  for (;;) {
+    const { done, value } = await rd.read();
+    if (done) break;
+    chunks.push(value); got += value.length; onp(got / total);
+  }
+  return new Blob(chunks, { type: r.headers.get('content-type') || 'video/mp4' });
+}
+
+async function showSpace() {
+  try {
+    const e = await navigator.storage.estimate();
+    $('mine-space').textContent = 'Espace utilisé : ' + fmtSize(e.usage || 0) + (e.quota ? ' sur ' + fmtSize(e.quota) + ' disponibles' : '');
+  } catch (err) {}
+}
 
 function renderMine() {
   const box = $('mine-list'); box.innerHTML = '';
-  const all = mine.map((v, i) => Object.assign({ i, saved: true }, v)).concat(session.map(v => Object.assign({ saved: false }, v)));
-  if (!all.length) { box.innerHTML = '<div class="empty">Aucune vidéo pour le moment.</div>'; return; }
-  all.forEach(v => {
+  if (!lib.length) box.innerHTML = '<div class="empty">Aucune vidéo pour le moment.</div>';
+  const mk = (txt, cls, fn) => { const b = document.createElement('button'); b.className = 'btn ' + cls; b.textContent = txt; b.onclick = fn; return b; };
+  lib.forEach(v => {
     const r = document.createElement('div'); r.className = 'mine-item';
-    r.innerHTML = '<span></span><button class="btn">▶ Lire</button><a class="btn alt">⬇</a>' + (v.saved ? '<button class="btn alt">🗑</button>' : '');
-    r.querySelector('span').textContent = v.name;
-    r.querySelector('button').onclick = () => playMine(v);
-    const a = r.querySelector('a'); a.href = v.url; a.download = v.name; a.target = '_blank'; a.rel = 'noopener';
-    if (v.saved) r.querySelectorAll('button')[1].onclick = () => { mine.splice(v.i, 1); store.set('jm_mine', JSON.stringify(mine)); renderMine(); };
+    r.innerHTML = '<div style="flex:1;min-width:0"><div class="nm"></div><div class="card-sub st"></div></div>';
+    r.querySelector('.nm').textContent = labelOf(v);
+    const st = r.querySelector('.st');
+    st.textContent = errs[v.id] || busy[v.id] || (v.offline ? '✓ Enregistrée dans l\'application • ' + fmtSize(v.size || 0) + ' • lisible hors ligne' : 'Lien en ligne (pas encore téléchargée)');
+    if (errs[v.id]) st.style.color = '#ff8a93';
+    r.appendChild(mk('▶', '', () => playMine(v.id)));
+    if (!v.offline && v.url && !busy[v.id]) r.appendChild(mk('⬇', 'alt', () => downloadOffline(v.id)));
+    if (v.offline) r.appendChild(mk('💾', 'alt', () => saveToPhone(v.id)));
+    r.appendChild(mk('🗑', 'alt', () => removeVid(v.id)));
     box.appendChild(r);
   });
+  showSpace();
 }
-function playMine(v) {
-  showModal('<h3 style="margin:10px 0 12px;font-size:15px"></h3><video class="frame" id="mv" controls playsinline autoplay></video><p class="err" id="mv-err"></p>');
-  $('modal-body').querySelector('h3').textContent = v.name;
-  const vid = $('mv'); vid.src = v.url;
-  vid.onerror = () => { $('mv-err').textContent = 'Lecture impossible : le lien est invalide ou le serveur bloque la lecture.'; };
+
+async function downloadOffline(id) {
+  const v = lib.find(x => x.id === id);
+  if (!v || !v.url || busy[id]) return;
+  delete errs[id];
+  busy[id] = 'Téléchargement… 0 %'; renderMine();
+  let last = -1;
+  const p = f => { const pc = Math.round(f * 100); if (pc - last >= 3 || pc === 100) { last = pc; busy[id] = 'Téléchargement… ' + pc + ' %'; renderMine(); } };
+  try {
+    const b = await fetchBlob(v.url, p);
+    await IDB.put(id, b);
+    v.offline = true; v.size = b.size; saveLib();
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+  } catch (e) {
+    errs[id] = 'Téléchargement impossible : ce site bloque la copie ou l\'espace est plein. Télécharge le fichier sur ton téléphone, puis ajoute-le avec « Fichier du téléphone ».';
+  }
+  delete busy[id]; renderMine();
 }
+
+async function playMine(id) {
+  const v = lib.find(x => x.id === id); if (!v) return;
+  if (curObj) { URL.revokeObjectURL(curObj); curObj = null; }
+  const seq = showModal('<h3 style="margin:10px 0 12px;font-size:15px"></h3><video class="frame" id="mv" controls playsinline autoplay></video><p class="err" id="mv-err"></p>');
+  $('modal-body').querySelector('h3').textContent = labelOf(v);
+  let src = v.url || '';
+  if (v.offline) {
+    try { const b = await IDB.get(id); if (b) { curObj = URL.createObjectURL(b); src = curObj; } } catch (e) {}
+  }
+  if (seq !== modalSeq) { if (curObj) { URL.revokeObjectURL(curObj); curObj = null; } return; }
+  if (!src) { $('mv-err').textContent = 'Vidéo introuvable dans l\'application.'; return; }
+  const vid = $('mv');
+  vid.onerror = () => { $('mv-err').textContent = 'Lecture impossible : fichier ou lien invalide.'; };
+  vid.src = src;
+}
+
+async function saveToPhone(id) {
+  const v = lib.find(x => x.id === id); if (!v) return;
+  try {
+    const b = await IDB.get(id); if (!b) return;
+    const u = URL.createObjectURL(b), a = document.createElement('a');
+    a.href = u; a.download = labelOf(v).replace(/[\\\/:*?"<>|]/g, '') + ((b.type || '').includes('webm') ? '.webm' : '.mp4');
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(u), 60000);
+  } catch (e) { errs[id] = 'Export impossible.'; renderMine(); }
+}
+
+async function removeVid(id) {
+  if (!confirm('Supprimer cette vidéo de l\'application ?')) return;
+  try { await IDB.del(id); } catch (e) {}
+  lib = lib.filter(x => x.id !== id); saveLib(); renderMine();
+}
+
 function addUrl() {
   const u = $('urlInput').value.trim();
-  if (!/^https?:\/\//i.test(u)) { $('urlInput').focus(); return; }
-  let name = u.split('?')[0].split('/').pop() || 'Vidéo';
-  try { name = decodeURIComponent(name); } catch (e) {}
-  mine.push({ name, url: u }); store.set('jm_mine', JSON.stringify(mine));
-  $('urlInput').value = ''; renderMine();
+  if (!/^https?:\/\//i.test(u)) { $('mine-msg').textContent = 'Colle un lien qui commence par http:// ou https://'; return; }
+  let nm = u.split('?')[0].split('/').pop() || 'Vidéo';
+  try { nm = decodeURIComponent(nm); } catch (e) {}
+  lib.push(Object.assign({ id: newId(), name: $('nameInput').value.trim() || nm.replace(/\.[^.]+$/, ''), url: u, offline: false }, fields()));
+  saveLib(); clearFields(); renderMine();
 }
-function addFile(inp) {
-  const f = inp.files[0]; if (!f) return;
-  session.push({ name: f.name, url: URL.createObjectURL(f) });
-  inp.value = ''; renderMine();
+
+async function addFile(inp) {
+  const f = inp.files[0]; inp.value = '';
+  if (!f) return;
+  const v = Object.assign({ id: newId(), name: $('nameInput').value.trim() || f.name.replace(/\.[^.]+$/, ''), offline: false }, fields());
+  $('mine-msg').textContent = 'Enregistrement dans l\'application…';
+  try {
+    await IDB.put(v.id, f);
+    v.offline = true; v.size = f.size; lib.push(v); saveLib(); clearFields();
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+  } catch (e) {
+    $('mine-msg').textContent = 'Espace insuffisant ou stockage indisponible : impossible d\'enregistrer ce fichier.';
+  }
+  renderMine();
 }
 
 window.onload = () => {
   renderMine();
+  ['Romance', 'Comédie', 'Action', 'Fantastique', 'Drame', 'Aventure', 'Horreur', 'Mystère', 'Science-fiction', 'Surnaturel', 'Sport'].forEach(t => {
+    const c = document.createElement('div'); c.className = 'chip2 glass'; c.textContent = t;
+    c.onclick = () => { $('searchInput').value = t; runSearch(t); window.scrollTo(0, 0); };
+    $('chips').appendChild(c);
+  });
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) navigator.serviceWorker.register('sw.js').catch(() => {});
   const cat = $('catalog');
   ROWS.forEach(cfg => cat.appendChild(buildRow(cfg)));
 };
