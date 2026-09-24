@@ -8,90 +8,74 @@
     <meta name="theme-color" content="#0d0d11">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { 
-            background: #0d0d11; 
-            color: #ffffff; 
-            padding-bottom: 60px; 
+        body {
+            background: radial-gradient(circle at 15% 0%, rgba(255,42,57,0.18), transparent 45%),
+                        radial-gradient(circle at 90% 60%, rgba(90,70,255,0.14), transparent 50%),
+                        #0d0d11;
+            background-attachment: fixed;
+            color: #fff;
+            padding-bottom: 60px;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Navigation Glassmorphism */
+        /* Navigation verre liquide */
         nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             padding: 12px 16px;
-            background: rgba(18, 18, 24, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+            backdrop-filter: blur(22px) saturate(180%);
+            -webkit-backdrop-filter: blur(22px) saturate(180%);
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.14);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
         }
         .logo-box { display: flex; align-items: center; gap: 8px; }
-        .logo-icon { width: 26px; height: 26px; background: #ff2a39; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: #fff; box-shadow: 0 0 10px rgba(255, 42, 57, 0.6); }
-        .logo { font-size: 18px; font-weight: 900; color: #ff2a39; letter-spacing: 0.8px; text-shadow: 0 0 12px rgba(255, 42, 57, 0.4); }
+        .logo-icon { width: 26px; height: 26px; background: #ff2a39; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: #fff; box-shadow: 0 0 10px rgba(255,42,57,0.6); }
+        .logo { font-size: 18px; font-weight: 900; color: #ff2a39; letter-spacing: 0.8px; text-shadow: 0 0 12px rgba(255,42,57,0.4); }
         .search-box input {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #fff;
-            padding: 7px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            outline: none;
-            width: 130px;
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            color: #fff; padding: 7px 14px; border-radius: 20px;
+            font-size: 12px; outline: none; width: 130px;
         }
+        .search-box input::placeholder { color: rgba(255,255,255,0.55); }
 
-        /* Hero Banner Coréenne & Animés */
+        /* Bannière */
         .hero {
-            position: relative;
-            height: 330px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
+            position: relative; height: 330px;
+            display: flex; flex-direction: column; justify-content: flex-end;
             padding: 20px 16px;
-            background-size: cover;
-            background-position: center;
+            background: #14141c center/cover no-repeat;
             transition: background-image 0.5s ease-in-out;
         }
         .hero-overlay {
-            position: absolute; top:0; left:0; width:100%; height:100%;
+            position: absolute; inset: 0;
             background: linear-gradient(180deg, rgba(13,13,17,0.1) 0%, rgba(13,13,17,0.85) 75%, #0d0d11 100%);
             z-index: 1;
         }
         .hero-content { position: relative; z-index: 2; }
-        .hero-badge { 
-            background: linear-gradient(135deg, #ff2a39, #ff5252); 
-            color: #fff; 
-            font-size: 10px; 
-            font-weight: 800; 
-            padding: 4px 10px; 
-            border-radius: 6px; 
-            width: fit-content; 
-            margin-bottom: 8px;
-            box-shadow: 0 2px 8px rgba(255, 42, 57, 0.4);
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(255,42,57,0.9), rgba(255,82,82,0.75));
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; font-size: 10px; font-weight: 800;
+            padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(255,42,57,0.4);
         }
         .hero h2 { font-size: 26px; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
         .hero p { font-size: 12px; color: #ddd; margin: 4px 0 16px; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
         .btn-play {
-            background: linear-gradient(135deg, #e50914, #ff2a39);
-            color: white;
-            border: none;
-            padding: 11px 24px;
-            font-size: 13px;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.5);
-            width: fit-content;
+            background: linear-gradient(135deg, rgba(229,9,20,0.85), rgba(255,42,57,0.7));
+            border: 1px solid rgba(255,255,255,0.35);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 6px 20px rgba(229,9,20,0.5);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            color: #fff; padding: 11px 24px; font-size: 13px; font-weight: bold;
+            border-radius: 25px; cursor: pointer; width: fit-content;
         }
-
-        .banner-dots {
-            position: absolute; right: 16px; bottom: 20px; z-index: 3;
-            display: flex; gap: 6px;
-        }
+        .banner-dots { position: absolute; right: 16px; bottom: 20px; z-index: 3; display: flex; gap: 6px; }
         .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s; }
         .dot.active { background: #ff2a39; width: 18px; border-radius: 10px; }
 
@@ -99,103 +83,75 @@
         .section { margin-top: 24px; padding: 0 16px; }
         .section-title { font-size: 16px; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
         .section-title::before { content: ''; width: 4px; height: 16px; background: #ff2a39; border-radius: 2px; box-shadow: 0 0 8px #ff2a39; }
-        
-        .row {
-            display: flex;
-            overflow-x: auto;
-            gap: 14px;
-            padding-bottom: 10px;
-            scrollbar-width: none;
-        }
+        .row { display: flex; overflow-x: auto; gap: 14px; padding-bottom: 10px; scrollbar-width: none; }
         .row::-webkit-scrollbar { display: none; }
+        .empty { color: #888; font-size: 12px; padding: 6px 0; }
 
-        /* Cartes translucides */
+        /* Cartes verre liquide */
         .card {
-            min-width: 130px;
-            width: 130px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            overflow: hidden;
-            flex-shrink: 0;
-            cursor: pointer;
-            position: relative;
-            backdrop-filter: blur(10px);
+            min-width: 130px; width: 130px;
+            background: linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));
+            border: 1px solid rgba(255,255,255,0.16);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 8px 24px rgba(0,0,0,0.35);
+            border-radius: 14px; overflow: hidden; flex-shrink: 0; cursor: pointer; position: relative;
+            backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%);
             transition: transform 0.2s;
         }
         .card:active { transform: scale(0.95); }
-        .card-img-wrapper {
-            width: 100%;
-            height: 180px;
-            background: #181822;
-            position: relative;
-        }
-        .card img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            display: block; 
-        }
-        .card-tag { 
-            position: absolute; top: 6px; right: 6px; 
-            background: rgba(0, 0, 0, 0.75); color: #fff; 
-            font-size: 9px; font-weight: 800; padding: 3px 6px; 
-            border-radius: 5px; backdrop-filter: blur(6px);
+        .card-img-wrapper { width: 100%; height: 180px; background: #181822; position: relative; }
+        .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .card-tag {
+            position: absolute; top: 6px; right: 6px; z-index: 2;
+            background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.2);
+            color: #fff; font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 5px;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         }
         .card-info { padding: 8px 8px 10px; }
         .card-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-        .card-sub { font-size: 10px; color: #888; margin-top: 2px; }
+        .card-sub { font-size: 10px; color: #a9a9b8; margin-top: 2px; }
 
-        /* Modale Lecteur Vidéo */
+        /* Lecteur vidéo */
         #player-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
-            flex-direction: column;
+            display: none; position: fixed; inset: 0;
+            background: rgba(5,5,10,0.88);
+            backdrop-filter: blur(26px) saturate(160%); -webkit-backdrop-filter: blur(26px) saturate(160%);
+            z-index: 1000; flex-direction: column;
         }
         .player-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 18px;
-            background: rgba(20, 20, 26, 0.9);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; justify-content: space-between; align-items: center; padding: 14px 18px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+            border-bottom: 1px solid rgba(255,255,255,0.14);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
         }
         .player-title { font-size: 14px; font-weight: 800; color: #fff; }
         .close-btn {
-            background: #ff2a39; color: #fff; border: none; 
-            padding: 7px 16px; border-radius: 20px; 
-            font-size: 12px; font-weight: bold; cursor: pointer;
+            background: rgba(255,42,57,0.85); border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;
         }
-        .video-container {
-            width: 100%; height: calc(100% - 55px);
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-        }
+        .video-container { width: 100%; height: calc(100% - 55px); display: flex; align-items: center; justify-content: center; position: relative; }
         video { width: 100%; max-height: 100%; outline: none; background: #000; }
 
-        /* Publicité 5s */
         #ad-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #0d0d11;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
+            position: absolute; inset: 0; background: #0d0d11 center/cover no-repeat;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;
         }
+        #ad-overlay::before { content: ''; position: absolute; inset: 0; background: rgba(13,13,17,0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
         .ad-timer {
-            position: absolute; top: 20px; right: 20px;
-            background: #ff2a39; color: #fff; padding: 6px 14px;
-            border-radius: 16px; font-size: 12px; font-weight: bold;
+            position: absolute; top: 20px; right: 20px; z-index: 2;
+            background: rgba(255,42,57,0.85); border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: bold;
         }
-        .ad-box { text-align: center; padding: 20px; }
+        .ad-box {
+            position: relative; z-index: 2; text-align: center; padding: 20px 24px; max-width: 86%;
+            background: linear-gradient(160deg, rgba(255,255,255,0.16), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 18px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        }
+        .ad-poster { width: 90px; height: 128px; object-fit: cover; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
         .ad-box h3 { color: #ff2a39; font-size: 20px; margin-bottom: 8px; }
-        .ad-box p { color: #aaa; font-size: 13px; }
+        .ad-box p { color: #ccc; font-size: 13px; }
+        #video-error { display: none; position: absolute; bottom: 16px; left: 16px; right: 16px; z-index: 5; text-align: center; font-size: 12px; padding: 10px; border-radius: 12px; background: rgba(255,42,57,0.25); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -206,20 +162,17 @@
             <div class="logo">JORVIE MOVIE</div>
         </div>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Recherche VF..." onkeyup="filterCatalog()">
+            <input type="text" id="searchInput" placeholder="Recherche VF..." oninput="filterCatalog()">
         </div>
     </nav>
 
-    <!-- Bannière Haute Dynamique -->
     <div class="hero" id="hero-banner">
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <span class="hero-badge" id="hero-badge">🇰🇷 BTS & K-DRAMA</span>
             <h2 id="hero-title">Business Proposal</h2>
             <p id="hero-desc">Série romantique coréenne incontournable (VF).</p>
-            <button class="btn-play" onclick="playCurrentHero()">
-                ▶ REGARDER EN VF
-            </button>
+            <button class="btn-play" onclick="playCurrentHero()">▶ REGARDER EN VF</button>
         </div>
         <div class="banner-dots">
             <div class="dot active" id="dot0"></div>
@@ -228,7 +181,6 @@
         </div>
     </div>
 
-    <!-- Modale Lecteur Vidéo -->
     <div id="player-modal">
         <div class="player-header">
             <span class="player-title" id="playing-title">Lecture vidéo</span>
@@ -238,164 +190,218 @@
             <div id="ad-overlay">
                 <div class="ad-timer" id="ad-timer">Publicité : 5s</div>
                 <div class="ad-box">
+                    <img class="ad-poster" id="ad-poster" alt="" style="display:none">
                     <h3>JORVIE MOVIE</h3>
                     <p>Chargement de votre vidéo en version française (VF)...</p>
                 </div>
             </div>
-            <video id="local-player" controls playsinline webkit-playsinline preload="auto">
-                <source id="video-source" src="" type="video/mp4">
-            </video>
+            <video id="local-player" controls playsinline webkit-playsinline preload="auto"></video>
+            <div id="video-error">Vidéo indisponible. Vérifie ta connexion et réessaie.</div>
         </div>
     </div>
 
-    <!-- Sections Exclusives -->
     <div class="section">
         <div class="section-title">🇰🇷 Acteurs & Stars Coréens</div>
         <div class="row" id="korean-stars-row"></div>
     </div>
-
     <div class="section">
         <div class="section-title">🌸 Dramas Coréens Romance (VF)</div>
         <div class="row" id="dramas-romance-row"></div>
     </div>
-
     <div class="section">
         <div class="section-title">⚔️ Animés Action & Fantasy (VF)</div>
         <div class="row" id="anime-action-row"></div>
     </div>
-
     <div class="section">
         <div class="section-title">💖 Animés Romance (VF)</div>
         <div class="row" id="anime-romance-row"></div>
     </div>
 
     <script>
-        // Liens vidéo universels très stables (MP4 H.264)
-        const videoStream1 = "https://vjs.zencdn.net/v/oceans.mp4";
-        const videoStream2 = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+        // Vidéos MP4 (la 3e sert de secours si une des deux premières échoue)
+        const V1 = "https://vjs.zencdn.net/v/oceans.mp4";
+        const V2 = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+        const V3 = "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+        const VIDEO_BACKUPS = [V1, V2, V3];
 
-        // Bannière dynamique avec visuels Coréens et Animés
-        const bannerItems = [
-            {
-                title: 'Business Proposal',
-                badge: '🇰🇷 K-DRAMA ROMANCE',
-                desc: 'La comédie romantique coréenne la plus regardée (VF).',
-                img: 'https://static.tvmaze.com/uploads/images/medium_portrait/398/996321.jpg',
-                video: videoStream1
-            },
-            {
-                title: 'Solo Leveling',
-                badge: '⚔️ ACTION MANGA',
-                desc: 'L\'animé d\'action coréen numéro 1 dans le monde (VF).',
-                img: 'https://static.tvmaze.com/uploads/images/medium_portrait/502/1255836.jpg',
-                video: videoStream2
-            },
-            {
-                title: 'Squid Game',
-                badge: '🔥 DRAMA CORÉEN',
-                desc: 'Le phénomène mondial coréen (VF Intégrale).',
-                img: 'https://static.tvmaze.com/uploads/images/medium_portrait/356/892225.jpg',
-                video: videoStream1
+        /* ---------- AFFICHES ----------
+           Chaque titre : q = nom recherché, person:true = acteur/personne, show = série de secours.
+           Les affiches sont téléchargées automatiquement depuis l'API TVMaze (gratuite, sans clé)
+           puis mémorisées pour ne pas être rechargées. */
+        const API = 'https://api.tvmaze.com';
+        const posters = {};   // q -> {m, o}
+        const pending = {};   // q -> Promise
+
+        function toHttps(u) { return u ? u.replace(/^http:/, 'https:') : u; }
+
+        async function lookup(item) {
+            const enc = encodeURIComponent;
+            let img = null;
+            try {
+                if (item.person) {
+                    const r = await (await fetch(`${API}/search/people?q=${enc(item.q)}`)).json();
+                    const hit = r.find(x => x.person && x.person.image);
+                    if (hit) img = hit.person.image;
+                }
+                if (!img) {
+                    const r = await fetch(`${API}/singlesearch/shows?q=${enc(item.show || item.q)}`);
+                    if (r.ok) { const s = await r.json(); img = s.image; }
+                }
+            } catch (e) { /* réseau indisponible : on garde l'affiche de secours */ }
+            return img ? { m: toHttps(img.medium || img.original), o: toHttps(img.original || img.medium) } : null;
+        }
+
+        function getPoster(item) {
+            const key = 'jm_poster_' + item.q;
+            if (posters[item.q]) return Promise.resolve(posters[item.q]);
+            try {
+                const c = JSON.parse(localStorage.getItem(key));
+                if (c && c.m) { posters[item.q] = c; return Promise.resolve(c); }
+            } catch (e) {}
+            if (!pending[item.q]) {
+                pending[item.q] = lookup(item).then(p => {
+                    if (p) {
+                        posters[item.q] = p;
+                        try { localStorage.setItem(key, JSON.stringify(p)); } catch (e) {}
+                    }
+                    return p;
+                });
             }
-        ];
-
-        let currentBannerIndex = 0;
-
-        function updateHeroBanner() {
-            const current = bannerItems[currentBannerIndex];
-            const heroEl = document.getElementById('hero-banner');
-            heroEl.style.backgroundImage = `url('${current.img}')`;
-            document.getElementById('hero-badge').innerText = current.badge;
-            document.getElementById('hero-title').innerText = current.title;
-            document.getElementById('hero-desc').innerText = current.desc;
-
-            for (let i = 0; i < 3; i++) {
-                document.getElementById(`dot${i}`).classList.toggle('active', i === currentBannerIndex);
-            }
+            return pending[item.q];
         }
-
-        function rotateBanner() {
-            currentBannerIndex = (currentBannerIndex + 1) % bannerItems.length;
-            updateHeroBanner();
-        }
-
-        setInterval(rotateBanner, 4000);
-
-        function playCurrentHero() {
-            const current = bannerItems[currentBannerIndex];
-            playMedia(current.title, current.video);
-        }
-
-        // Section Stars & Idols Coréens
-        const koreanStarsData = [
-            { title: 'Cha Eun-woo', sub: 'K-Drama Idol', tag: 'STAR', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/398/996321.jpg', video: videoStream1 },
-            { title: 'Song Kang', sub: 'My Demon', tag: 'STAR', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/356/892225.jpg', video: videoStream2 },
-            { title: 'BTS - World Tour', sub: 'Concert • VF', tag: 'K-POP', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/234/585642.jpg', video: videoStream1 },
-            { title: 'Park Seo-joon', sub: 'Itaewon Class', tag: 'ACTEUR', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/394/985558.jpg', video: videoStream2 }
-        ];
-
-        // Dramas Coréens
-        const dramasRomanceData = [
-            { title: 'Business Proposal', sub: 'Saison 1 • VF', tag: 'VF HD', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/398/996321.jpg', video: videoStream1 },
-            { title: 'Crash Landing on You', sub: 'Romance • VF', tag: 'VF 4K', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/234/585642.jpg', video: videoStream2 },
-            { title: 'Squid Game', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/356/892225.jpg', video: videoStream1 },
-            { title: 'All of Us Are Dead', sub: 'Horreur • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/394/985558.jpg', video: videoStream2 }
-        ];
-
-        // Animés Action
-        const animeActionData = [
-            { title: 'Solo Leveling', sub: 'Saison 1 • VF', tag: 'VF 4K', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/502/1255836.jpg', video: videoStream1 },
-            { title: 'Demon Slayer', sub: 'Saison 1 • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/498/1245458.jpg', video: videoStream2 },
-            { title: 'Jujutsu Kaisen', sub: 'Saison 2 • VF', tag: 'VF HD', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/470/1175488.jpg', video: videoStream1 }
-        ];
-
-        // Animés Romance
-        const animeRomanceData = [
-            { title: 'Kaguya-sama', sub: 'Romance • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/405/1013401.jpg', video: videoStream1 },
-            { title: 'Horimiya', sub: 'Romance • VF', tag: 'VF HD', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/291/728989.jpg', video: videoStream2 },
-            { title: 'My Dress-Up Darling', sub: 'Romance • VF', tag: 'VF', img: 'https://static.tvmaze.com/uploads/images/medium_portrait/394/985550.jpg', video: videoStream1 }
-        ];
 
         function getSVGPlaceholder(title) {
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="130" height="180" viewBox="0 0 130 180"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="45%" fill="#ff2a39" font-family="sans-serif" font-weight="900" font-size="28" text-anchor="middle">🎬</text><text x="50%" y="70%" fill="#ffffff" font-family="sans-serif" font-weight="bold" font-size="10" text-anchor="middle">${title}</text></svg>`;
+            const safe = String(title).replace(/[<>&]/g, '');
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="130" height="180" viewBox="0 0 130 180"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a1420"/><stop offset="1" stop-color="#14141f"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><text x="50%" y="48%" font-size="34" text-anchor="middle">🎬</text><text x="50%" y="72%" fill="#ffffff" font-family="sans-serif" font-weight="bold" font-size="10" text-anchor="middle">${safe}</text></svg>`;
             return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
         }
 
+        /* ---------- DONNÉES ---------- */
+        const bannerItems = [
+            { title: 'Business Proposal', q: 'Business Proposal', badge: '🇰🇷 K-DRAMA ROMANCE', desc: 'La comédie romantique coréenne la plus regardée (VF).', video: V1 },
+            { title: 'Solo Leveling', q: 'Solo Leveling', badge: '⚔️ ACTION MANGA', desc: "L'animé d'action coréen numéro 1 dans le monde (VF).", video: V2 },
+            { title: 'Squid Game', q: 'Squid Game', badge: '🔥 DRAMA CORÉEN', desc: 'Le phénomène mondial coréen (VF Intégrale).', video: V1 }
+        ];
+
+        const koreanStarsData = [
+            { title: 'Cha Eun-woo', q: 'Cha Eun-woo', person: true, show: 'True Beauty', sub: 'K-Drama Idol', tag: 'STAR', video: V1 },
+            { title: 'Song Kang', q: 'Song Kang', person: true, show: 'Sweet Home', sub: 'My Demon', tag: 'STAR', video: V2 },
+            { title: 'BTS - World Tour', q: 'Run BTS', show: 'Run BTS', sub: 'Concert • VF', tag: 'K-POP', video: V1 },
+            { title: 'Park Seo-joon', q: 'Park Seo-joon', person: true, show: 'Itaewon Class', sub: 'Itaewon Class', tag: 'ACTEUR', video: V2 }
+        ];
+
+        const dramasRomanceData = [
+            { title: 'Business Proposal', q: 'Business Proposal', sub: 'Saison 1 • VF', tag: 'VF HD', video: V1 },
+            { title: 'Crash Landing on You', q: 'Crash Landing on You', sub: 'Romance • VF', tag: 'VF 4K', video: V2 },
+            { title: 'Squid Game', q: 'Squid Game', sub: 'Saison 1 • VF', tag: 'VF', video: V1 },
+            { title: 'All of Us Are Dead', q: 'All of Us Are Dead', sub: 'Horreur • VF', tag: 'VF', video: V2 }
+        ];
+
+        const animeActionData = [
+            { title: 'Solo Leveling', q: 'Solo Leveling', sub: 'Saison 1 • VF', tag: 'VF 4K', video: V1 },
+            { title: 'Demon Slayer', q: 'Demon Slayer: Kimetsu no Yaiba', sub: 'Saison 1 • VF', tag: 'VF', video: V2 },
+            { title: 'Jujutsu Kaisen', q: 'Jujutsu Kaisen', sub: 'Saison 2 • VF', tag: 'VF HD', video: V1 }
+        ];
+
+        const animeRomanceData = [
+            { title: 'Kaguya-sama', q: 'Kaguya-sama: Love Is War', sub: 'Romance • VF', tag: 'VF', video: V1 },
+            { title: 'Horimiya', q: 'Horimiya', sub: 'Romance • VF', tag: 'VF HD', video: V2 },
+            { title: 'My Dress-Up Darling', q: 'My Dress-Up Darling', sub: 'Romance • VF', tag: 'VF', video: V1 }
+        ];
+
+        /* ---------- BANNIÈRE ---------- */
+        let currentBannerIndex = 0;
+
+        function updateHeroBanner() {
+            const cur = bannerItems[currentBannerIndex];
+            document.getElementById('hero-badge').innerText = cur.badge;
+            document.getElementById('hero-title').innerText = cur.title;
+            document.getElementById('hero-desc').innerText = cur.desc;
+            for (let i = 0; i < bannerItems.length; i++) {
+                document.getElementById('dot' + i).classList.toggle('active', i === currentBannerIndex);
+            }
+            const heroEl = document.getElementById('hero-banner');
+            const idx = currentBannerIndex;
+            getPoster(cur).then(p => {
+                if (p && idx === currentBannerIndex) heroEl.style.backgroundImage = `url('${p.o}')`;
+            });
+        }
+
+        setInterval(() => {
+            currentBannerIndex = (currentBannerIndex + 1) % bannerItems.length;
+            updateHeroBanner();
+        }, 4000);
+
+        function playCurrentHero() { playMedia(bannerItems[currentBannerIndex]); }
+
+        /* ---------- CATALOGUE ---------- */
         function renderRow(list, containerId) {
             const container = document.getElementById(containerId);
-            if(!container) return;
+            if (!container) return;
             container.innerHTML = '';
+            if (!list.length) { container.innerHTML = '<div class="empty">Aucun résultat</div>'; return; }
             list.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.onclick = () => playMedia(item.title, item.video);
-                
-                const fallbackImg = getSVGPlaceholder(item.title);
+                card.onclick = () => playMedia(item);
 
+                const fallback = getSVGPlaceholder(item.title);
                 card.innerHTML = `
                     <div class="card-img-wrapper">
                         <span class="card-tag">${item.tag}</span>
-                        <img src="${item.img}" alt="${item.title}" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImg}';">
+                        <img alt="" src="${fallback}">
                     </div>
                     <div class="card-info">
-                        <div class="card-title">${item.title}</div>
-                        <div class="card-sub">${item.sub}</div>
-                    </div>
-                `;
+                        <div class="card-title"></div>
+                        <div class="card-sub"></div>
+                    </div>`;
+                card.querySelector('.card-title').textContent = item.title;
+                card.querySelector('.card-sub').textContent = item.sub;
+                const img = card.querySelector('img');
+                img.alt = item.title;
+                img.onerror = () => { img.onerror = null; img.src = fallback; };
+                getPoster(item).then(p => { if (p) img.src = p.m; });
                 container.appendChild(card);
             });
         }
 
+        /* ---------- LECTEUR ---------- */
         let adTimerInterval;
+        let backupIndex = 0;
 
-        function playMedia(title, videoUrl) {
-            document.getElementById('playing-title').innerText = title;
+        function playMedia(item) {
             const player = document.getElementById('local-player');
-            const source = document.getElementById('video-source');
             const adOverlay = document.getElementById('ad-overlay');
             const adTimer = document.getElementById('ad-timer');
+            const adPoster = document.getElementById('ad-poster');
+            const errBox = document.getElementById('video-error');
 
-            source.src = videoUrl;
+            document.getElementById('playing-title').innerText = item.title;
+            errBox.style.display = 'none';
+
+            // Affiche de la vidéo : sur le lecteur et pendant la pub
+            const applyPoster = p => {
+                if (!p) return;
+                player.poster = p.o;
+                adPoster.src = p.m;
+                adPoster.style.display = 'block';
+                adOverlay.style.backgroundImage = `url('${p.o}')`;
+            };
+            player.removeAttribute('poster');
+            adPoster.style.display = 'none';
+            adOverlay.style.backgroundImage = 'none';
+            getPoster(item).then(applyPoster);
+
+            // Vidéo + secours automatique si un lien ne répond pas
+            const sources = [item.video, ...VIDEO_BACKUPS.filter(v => v !== item.video)];
+            let s = 0;
+            player.onerror = () => {
+                s++;
+                if (s < sources.length) { player.src = sources[s]; player.load(); }
+                else errBox.style.display = 'block';
+            };
+            player.pause();
+            player.src = sources[0];
             player.load();
 
             adOverlay.style.display = 'flex';
@@ -403,7 +409,6 @@
 
             let count = 5;
             adTimer.innerText = `Publicité : ${count}s`;
-
             clearInterval(adTimerInterval);
             adTimerInterval = setInterval(() => {
                 count--;
@@ -412,23 +417,24 @@
                 } else {
                     clearInterval(adTimerInterval);
                     adOverlay.style.display = 'none';
-                    player.play().catch(err => {
-                        console.log("Lecture manuelle requise :", err);
-                    });
+                    player.play().catch(() => { /* lecture manuelle via le bouton ▶ */ });
                 }
             }, 1000);
         }
 
         function closePlayer() {
             const player = document.getElementById('local-player');
-            player.pause();
             clearInterval(adTimerInterval);
+            player.onerror = null;
+            player.pause();
+            player.removeAttribute('src');
+            player.load();
             document.getElementById('player-modal').style.display = 'none';
         }
 
         function filterCatalog() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filter = list => list.filter(item => item.title.toLowerCase().includes(query));
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const filter = list => list.filter(i => i.title.toLowerCase().includes(query));
             renderRow(filter(koreanStarsData), 'korean-stars-row');
             renderRow(filter(dramasRomanceData), 'dramas-romance-row');
             renderRow(filter(animeActionData), 'anime-action-row');
@@ -437,10 +443,7 @@
 
         window.onload = () => {
             updateHeroBanner();
-            renderRow(koreanStarsData, 'korean-stars-row');
-            renderRow(dramasRomanceData, 'dramas-romance-row');
-            renderRow(animeActionData, 'anime-action-row');
-            renderRow(animeRomanceData, 'anime-romance-row');
+            filterCatalog();
         };
     </script>
 </body>
