@@ -8,14 +8,21 @@
 <meta name="theme-color" content="#0d0d11">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-body { background: radial-gradient(circle at 15% 0%, rgba(255,42,57,.18), transparent 45%), radial-gradient(circle at 90% 60%, rgba(90,70,255,.14), transparent 50%), #0d0d11; background-attachment: fixed; color: #fff; padding-bottom: 40px; user-select: none; -webkit-tap-highlight-color: transparent; }
+body { background: #0d0d11; color: #fff; padding-bottom: 40px; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 input { user-select: text; -webkit-user-select: text; }
-.glass { background: linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.04)); border: 1px solid rgba(255,255,255,.16); box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 8px 24px rgba(0,0,0,.35); backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%); }
-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)); backdrop-filter: blur(22px) saturate(180%); -webkit-backdrop-filter: blur(22px) saturate(180%); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.15); }
+/* Sphères de transparence */
+.orb { position: fixed; border-radius: 50%; filter: blur(38px); opacity: .6; pointer-events: none; z-index: -1; animation: float 14s ease-in-out infinite alternate; }
+.orb.a { width: 230px; height: 230px; left: -70px; top: 16%; background: radial-gradient(circle at 30% 30%, #ff2a39, transparent 70%); }
+.orb.b { width: 270px; height: 270px; right: -100px; top: 50%; background: radial-gradient(circle at 30% 30%, #6a5cff, transparent 70%); animation-delay: -5s; }
+.orb.c { width: 190px; height: 190px; left: 28%; bottom: -70px; background: radial-gradient(circle at 30% 30%, #ff9a3c, transparent 70%); animation-delay: -9s; }
+@keyframes float { to { transform: translate(34px, -46px) scale(1.15); } }
+@media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
+.glass { background: linear-gradient(160deg, rgba(255,255,255,.15), rgba(255,255,255,.04)); border: 1px solid rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 8px 24px rgba(0,0,0,.35); backdrop-filter: blur(18px) saturate(170%); -webkit-backdrop-filter: blur(18px) saturate(170%); }
+nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.03)); backdrop-filter: blur(22px) saturate(180%); -webkit-backdrop-filter: blur(22px) saturate(180%); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.15); }
 .logo-box { display: flex; align-items: center; gap: 8px; }
 .logo-icon { width: 26px; height: 26px; background: #ff2a39; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; box-shadow: 0 0 10px rgba(255,42,57,.6); }
 .logo { font-size: 18px; font-weight: 900; color: #ff2a39; letter-spacing: .8px; text-shadow: 0 0 12px rgba(255,42,57,.4); }
-.search-box input { background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); color: #fff; padding: 7px 14px; border-radius: 20px; font-size: 12px; outline: none; width: 140px; }
+.search-box input { background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); color: #fff; padding: 7px 14px; border-radius: 20px; font-size: 12px; outline: none; width: 150px; }
 .search-box input::placeholder { color: rgba(255,255,255,.55); }
 .hero { position: relative; height: 330px; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px 16px; background: #14141c center/cover no-repeat; }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(13,13,17,.1) 0%, rgba(13,13,17,.85) 75%, #0d0d11 100%); z-index: 1; }
@@ -24,14 +31,14 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .hero h2 { font-size: 26px; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,.9); }
 .hero p { font-size: 12px; color: #ddd; margin: 4px 0 16px; text-shadow: 0 1px 5px rgba(0,0,0,.8); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .btn { background: linear-gradient(135deg, rgba(229,9,20,.85), rgba(255,42,57,.7)); border: 1px solid rgba(255,255,255,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 6px 20px rgba(229,9,20,.4); color: #fff; padding: 10px 20px; font-size: 13px; font-weight: bold; border-radius: 25px; cursor: pointer; text-decoration: none; display: inline-block; }
-.btn.alt { background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+.btn.alt { background: rgba(255,255,255,.13); box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
 .banner-dots { position: absolute; right: 16px; bottom: 20px; z-index: 3; display: flex; gap: 6px; }
 .dot { width: 8px; height: 8px; background: rgba(255,255,255,.4); border-radius: 50%; transition: .3s; }
 .dot.active { background: #ff2a39; width: 18px; border-radius: 10px; }
 .section { margin-top: 24px; padding: 0 16px; }
 .section-title { font-size: 16px; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .section-title::before { content: ''; width: 4px; height: 16px; background: #ff2a39; border-radius: 2px; box-shadow: 0 0 8px #ff2a39; }
-.row { display: flex; overflow-x: auto; gap: 14px; padding-bottom: 10px; scrollbar-width: none; }
+.row { display: flex; overflow-x: auto; gap: 14px; padding-bottom: 10px; scrollbar-width: none; min-height: 60px; }
 .row::-webkit-scrollbar { display: none; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 12px; }
 .grid .card { width: auto; min-width: 0; }
@@ -45,50 +52,34 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .card-info { padding: 8px 8px 10px; }
 .card-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-sub { font-size: 10px; color: #a9a9b8; margin-top: 2px; }
-#modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(5,5,10,.8); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); align-items: flex-end; justify-content: center; }
-.sheet { width: 100%; max-width: 640px; max-height: 92%; overflow-y: auto; padding: 16px; border-radius: 22px 22px 0 0; }
+#modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(5,5,10,.72); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); align-items: flex-end; justify-content: center; }
+.sheet { width: 100%; max-width: 640px; max-height: 92%; overflow-y: auto; padding: 16px; border-radius: 24px 24px 0 0; }
 .close-btn { background: rgba(255,42,57,.85); border: 1px solid rgba(255,255,255,.3); color: #fff; padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; float: right; }
 .head { display: flex; gap: 14px; margin-top: 8px; clear: both; }
-.head img { width: 100px; height: 150px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+.head img { width: 100px; height: 150px; object-fit: cover; border-radius: 12px; flex-shrink: 0; background: #181822; }
 .head h3 { font-size: 18px; font-weight: 900; }
 .meta { font-size: 11px; color: #b5b5c4; margin-top: 4px; line-height: 1.5; }
 .syn { font-size: 13px; line-height: 1.55; color: #e6e6ee; margin: 14px 0; user-select: text; -webkit-user-select: text; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.prov-group { margin-top: 10px; font-size: 12px; }
-.prov { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.chip { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 16px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); font-size: 11px; }
-.chip img { width: 22px; height: 22px; border-radius: 6px; }
-.frame { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 12px; background: #000; margin-bottom: 12px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 14px; }
+.actions .btn { padding: 8px 14px; font-size: 12px; }
+.frame { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 12px; background: #000; margin: 10px 0; }
 video.frame { max-height: 60vh; }
-#setup, .mine { margin: 24px 16px 0; padding: 18px; border-radius: 18px; font-size: 13px; line-height: 1.6; }
-#setup ol { margin: 10px 0 12px 18px; }
+.mine { margin: 24px 16px 0; padding: 18px; border-radius: 18px; font-size: 13px; line-height: 1.6; }
 .field { width: 100%; padding: 10px 14px; margin: 6px 0; border-radius: 14px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; font-size: 13px; outline: none; }
 .err { color: #ff8a93; font-size: 12px; margin-top: 6px; }
 .mine-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.1); font-size: 12px; }
 .mine-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 .mine-item .btn { padding: 6px 12px; font-size: 11px; }
 footer { margin: 28px 16px 0; font-size: 10px; color: #7d7d8c; line-height: 1.5; text-align: center; }
-footer a { color: #ff2a39; }
 </style>
 </head>
 <body>
+<div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
 
 <nav>
   <div class="logo-box"><div class="logo-icon">J</div><div class="logo">JORVIE MOVIE</div></div>
   <div class="search-box"><input type="text" id="searchInput" placeholder="Recherche VF..." autocomplete="off"></div>
 </nav>
-
-<div id="setup" class="glass" style="display:none">
-  <b style="font-size:15px">🔑 Une clé gratuite est nécessaire</b>
-  <ol>
-    <li>Crée un compte gratuit sur <b>themoviedb.org</b></li>
-    <li>Va dans Paramètres → API → « Créer » (usage personnel)</li>
-    <li>Colle ta clé (ou le « jeton d'accès en lecture ») ici :</li>
-  </ol>
-  <input class="field" id="keyInput" placeholder="Ta clé TMDB" autocomplete="off">
-  <button class="btn" onclick="saveKey()">Enregistrer</button>
-  <div class="err" id="keyErr"></div>
-</div>
 
 <div id="home">
   <div class="hero" id="hero-banner">
@@ -96,7 +87,7 @@ footer a { color: #ff2a39; }
     <div class="hero-content">
       <span class="hero-badge" id="hero-badge">🇰🇷 CHARGEMENT</span>
       <h2 id="hero-title">JORVIE MOVIE</h2>
-      <p id="hero-desc">Chargement du catalogue en français…</p>
+      <p id="hero-desc">Chargement du catalogue…</p>
       <button class="btn" onclick="heroDetail()">▶ VOIR LA FICHE</button>
     </div>
     <div class="banner-dots"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div><div class="dot" id="dot2"></div></div>
@@ -109,11 +100,11 @@ footer a { color: #ff2a39; }
   <div class="grid" id="results"></div>
 </div>
 
-<div class="mine glass" id="mine">
+<div class="mine glass">
   <b style="font-size:15px">📁 Mes vidéos</b>
   <p class="empty">Ajoute uniquement des vidéos que tu possèdes ou qui sont libres de droits. Tu peux les lire et les télécharger ici.</p>
   <input class="field" id="urlInput" placeholder="Lien direct d'une vidéo (.mp4)" autocomplete="off">
-  <div class="actions" style="margin-top:6px">
+  <div class="actions">
     <button class="btn alt" onclick="addUrl()">＋ Ajouter le lien</button>
     <button class="btn alt" onclick="document.getElementById('fileInput').click()">📂 Choisir un fichier</button>
     <input type="file" id="fileInput" accept="video/*" style="display:none" onchange="addFile(this)">
@@ -121,63 +112,122 @@ footer a { color: #ff2a39; }
   <div id="mine-list"></div>
 </div>
 
-<footer>
-  Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.<br>
-  Disponibilités : données JustWatch via TMDB. <a href="#" onclick="resetKey();return false;">Changer la clé</a>
-</footer>
+<footer>Données : AniList (animés), Wikidata et Wikipédia FR (dramas et films coréens), traduction MyMemory. Les épisodes se regardent sur les plateformes officielles indiquées dans chaque fiche.</footer>
 
 <div id="modal" onclick="if(event.target===this)closeModal()">
   <div class="sheet glass"><button class="close-btn" onclick="closeModal()">✕ Fermer</button><div id="modal-body"></div></div>
 </div>
 
 <script>
-// Tu peux coller ta clé TMDB ici (sinon l'appli te la demande au premier lancement)
-const TMDB_KEY = '';
-
-const IMG = 'https://image.tmdb.org/t/p/w342', BACK = 'https://image.tmdb.org/t/p/w780', LOGO = 'https://image.tmdb.org/t/p/w45';
 const $ = id => document.getElementById(id);
+const enc = encodeURIComponent;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
-let key = TMDB_KEY || store.get('jm_tmdb') || '';
-
-async function api(path, params) {
-  const u = new URL('https://api.themoviedb.org/3' + path);
-  u.searchParams.set('language', 'fr-FR');
-  Object.entries(params || {}).forEach(([k, v]) => u.searchParams.set(k, v));
-  const opt = {};
-  if (key.length > 40) opt.headers = { Authorization: 'Bearer ' + key }; else u.searchParams.set('api_key', key);
-  const r = await fetch(u, opt);
-  if (!r.ok) throw new Error(r.status);
-  return r.json();
-}
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const GENRES = { Action: 'Action', Adventure: 'Aventure', Comedy: 'Comédie', Drama: 'Drame', Fantasy: 'Fantastique', Horror: 'Horreur', Mystery: 'Mystère', Romance: 'Romance', 'Sci-Fi': 'Science-fiction', 'Slice of Life': 'Tranche de vie', Sports: 'Sport', Supernatural: 'Surnaturel', Thriller: 'Thriller', Psychological: 'Psychologique', Music: 'Musique', 'Mahou Shoujo': 'Magical girl', Ecchi: 'Ecchi' };
 
 function placeholder(title) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="130" height="180" viewBox="0 0 130 180"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="48%" font-size="34" text-anchor="middle">🎬</text><text x="50%" y="72%" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="10" text-anchor="middle">${esc(title).slice(0, 22)}</text></svg>`;
-  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  return 'data:image/svg+xml;charset=utf-8,' + enc(svg);
+}
+function plain(html) { return new DOMParser().parseFromString(String(html || '').replace(/<br\s*\/?>/gi, ' '), 'text/html').body.textContent.replace(/\s+/g, ' ').trim(); }
+
+/* ================= SOURCE 1 : AniList (animés, sans clé) ================= */
+const AL = 'query($p:Int,$s:String,$sort:[MediaSort],$g:[String],$f:MediaFormat){Page(page:$p,perPage:20){pageInfo{hasNextPage}media(type:ANIME,search:$s,sort:$sort,genre_in:$g,format:$f,isAdult:false){id title{romaji english}coverImage{large}bannerImage description(asHtml:false)averageScore seasonYear episodes format genres trailer{id site}externalLinks{site url type language}}}}';
+
+async function anilist(vars) {
+  const r = await fetch('https://graphql.anilist.co', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ query: AL, variables: vars }) });
+  const j = await r.json();
+  if (!r.ok || j.errors) throw new Error('anilist');
+  return j.data.Page;
+}
+function alItem(m) {
+  return {
+    src: 'al', id: 'al' + m.id, title: m.title.english || m.title.romaji, poster: m.coverImage && m.coverImage.large, banner: m.bannerImage,
+    year: m.seasonYear || '', score: m.averageScore ? (m.averageScore / 10).toFixed(1) : '', tag: m.format === 'MOVIE' ? 'FILM' : 'ANIMÉ',
+    extra: [m.episodes ? m.episodes + ' épisode' + (m.episodes > 1 ? 's' : '') : '', (m.genres || []).slice(0, 3).map(g => GENRES[g] || g).join(', ')].filter(Boolean).join(' • '),
+    desc: m.description || '', links: m.externalLinks || [], trailer: m.trailer
+  };
 }
 
-/* ---------- Cartes ---------- */
-function card(x) {
-  const title = x.title || x.name, year = (x.release_date || x.first_air_date || '').slice(0, 4);
+/* ================= SOURCE 2 : Wikidata + Wikipédia FR (dramas et films coréens, sans clé) ================= */
+const Q_FILM = 'Q11424', Q_SERIES = 'Q5398426';
+const wdQ = (head, tail) => `SELECT ?f ?fLabel ?fDescription ?cls ?img ?date ?s ?art WHERE { ${head} ?f wdt:P31 ?cls; wdt:P495 wd:Q884; wikibase:sitelinks ?s; wdt:P3383|wdt:P18 ?img. OPTIONAL { ?f wdt:P577|wdt:P580 ?date } OPTIONAL { ?art schema:about ?f; schema:isPartOf <https://fr.wikipedia.org/> } SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en,ko". } } ORDER BY DESC(?s) ${tail}`;
+
+async function sparql(q) {
+  const r = await fetch('https://query.wikidata.org/sparql?format=json&query=' + enc(q));
+  if (!r.ok) throw new Error('wikidata');
+  return (await r.json()).results.bindings;
+}
+function wdItems(rows) {
+  const seen = {}, out = [];
+  rows.forEach(b => {
+    const id = b.f.value.split('/').pop(), title = b.fLabel && b.fLabel.value;
+    if (seen[id] || !title || /^Q\d+$/.test(title)) return;
+    seen[id] = 1;
+    const isFilm = b.cls.value.endsWith(Q_FILM);
+    out.push({
+      src: 'wd', id, title, poster: b.img.value.replace(/^http:/, 'https:') + '?width=320',
+      year: b.date ? b.date.value.slice(0, 4) : '', score: '', tag: isFilm ? 'FILM' : 'K-DRAMA',
+      extra: isFilm ? 'Film coréen' : 'Drama coréen',
+      desc: b.fDescription ? b.fDescription.value : '', art: b.art ? b.art.value : ''
+    });
+  });
+  return out;
+}
+async function wdBrowse(cls, p) {
+  const rows = await sparql(wdQ(`VALUES ?cls { wd:${cls} }`, `LIMIT 30 OFFSET ${(p - 1) * 30}`));
+  return { items: wdItems(rows), more: rows.length >= 30 };
+}
+async function wdSearch(q) {
+  const rs = await Promise.all(['fr', 'en'].map(l => fetch(`https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${enc(q)}&language=${l}&uselang=${l}&type=item&limit=30&format=json&origin=*`).then(r => r.json()).catch(() => ({ search: [] }))));
+  const ids = [...new Set(rs.flatMap(r => (r.search || []).map(x => x.id)))].slice(0, 60);
+  if (!ids.length) return [];
+  const rows = await sparql(wdQ(`VALUES ?f { ${ids.map(i => 'wd:' + i).join(' ')} } VALUES ?cls { wd:${Q_FILM} wd:${Q_SERIES} }`, 'LIMIT 40'));
+  return wdItems(rows);
+}
+
+/* ================= Traduction en français ================= */
+const trCache = {};
+async function toFr(text) {
+  text = (text || '').trim();
+  if (!text) return '';
+  if (trCache[text]) return trCache[text];
+  const sentences = text.match(/[^.!?]+[.!?]*\s*/g) || [text];
+  const parts = []; let cur = '';
+  sentences.forEach(s => {
+    if ((cur + s).length > 420) { if (cur) parts.push(cur.trim()); cur = s.slice(0, 420); } else cur += s;
+  });
+  if (cur) parts.push(cur.trim());
+  const use = parts.slice(0, 4);
+  const out = await Promise.all(use.map(p => fetch('https://api.mymemory.translated.net/get?q=' + enc(p) + '&langpair=en|fr').then(r => r.json()).then(j => (j.responseStatus == 200 && j.responseData.translatedText) || p).catch(() => p)));
+  const res = out.join(' ') + (parts.length > 4 ? '…' : '');
+  trCache[text] = res;
+  return res;
+}
+
+/* ================= Cartes & catalogue ================= */
+function card(it) {
   const el = document.createElement('div'); el.className = 'card glass';
-  el.innerHTML = `<div class="card-img-wrapper"><span class="card-tag">${x.media === 'movie' ? 'FILM' : 'SÉRIE'}</span><img alt="" loading="lazy"></div><div class="card-info"><div class="card-title"></div><div class="card-sub"></div></div>`;
-  const ph = placeholder(title), img = el.querySelector('img');
-  img.src = x.poster_path ? IMG + x.poster_path : ph;
+  el.innerHTML = '<div class="card-img-wrapper"><span class="card-tag"></span><img alt="" loading="lazy"></div><div class="card-info"><div class="card-title"></div><div class="card-sub"></div></div>';
+  const ph = placeholder(it.title), img = el.querySelector('img');
+  img.src = it.poster || ph;
   img.onerror = () => { img.onerror = null; img.src = ph; };
-  el.querySelector('.card-title').textContent = title;
-  el.querySelector('.card-sub').textContent = [year, x.vote_average ? '★ ' + x.vote_average.toFixed(1) : ''].filter(Boolean).join(' • ');
-  el.onclick = () => openDetail(x);
+  el.querySelector('.card-tag').textContent = it.tag;
+  el.querySelector('.card-title').textContent = it.title;
+  el.querySelector('.card-sub').textContent = [it.year, it.score ? '★ ' + it.score : ''].filter(Boolean).join(' • ') || it.extra;
+  el.onclick = () => openDetail(it);
   return el;
 }
 
-/* ---------- Catalogue (défilement infini) ---------- */
+const alRow = vars => async p => { const d = await anilist(Object.assign({ p }, vars)); return { items: d.media.map(alItem).filter(x => x.poster), more: d.pageInfo.hasNextPage }; };
 const ROWS = [
-  { t: '🇰🇷 Dramas coréens', p: '/discover/tv', q: { with_original_language: 'ko' }, type: 'tv', hero: 1 },
-  { t: '🎬 Films coréens', p: '/discover/movie', q: { with_original_language: 'ko' }, type: 'movie', hero: 1 },
-  { t: '⚔️ Animés (séries)', p: '/discover/tv', q: { with_original_language: 'ja', with_genres: '16' }, type: 'tv', hero: 1 },
-  { t: '🌸 Dramas coréens romance', p: '/discover/tv', q: { with_original_language: 'ko', with_genres: '10749' }, type: 'tv' },
-  { t: '💖 Animés romance', p: '/discover/tv', q: { with_original_language: 'ja', with_genres: '16,10749' }, type: 'tv' },
-  { t: '🎞️ Films d\'animés', p: '/discover/movie', q: { with_original_language: 'ja', with_genres: '16' }, type: 'movie' }
+  { t: '⚔️ Animés populaires', load: alRow({ sort: ['POPULARITY_DESC'] }), hero: 1 },
+  { t: '🇰🇷 Dramas coréens', load: p => wdBrowse(Q_SERIES, p) },
+  { t: '🎬 Films coréens', load: p => wdBrowse(Q_FILM, p) },
+  { t: '🔥 Animés du moment', load: alRow({ sort: ['TRENDING_DESC'] }) },
+  { t: '💖 Animés romance', load: alRow({ sort: ['POPULARITY_DESC'], g: ['Romance'] }) },
+  { t: '🗡️ Animés action', load: alRow({ sort: ['POPULARITY_DESC'], g: ['Action'] }) },
+  { t: '🎞️ Films d\'animés', load: alRow({ sort: ['POPULARITY_DESC'], f: 'MOVIE' }) }
 ];
 const heroItems = [];
 
@@ -185,122 +235,123 @@ function buildRow(cfg) {
   const sec = document.createElement('div'); sec.className = 'section';
   sec.innerHTML = '<div class="section-title"></div><div class="row"></div>';
   sec.firstChild.textContent = cfg.t;
-  const row = sec.lastChild;
-  cfg.page = 0; cfg.busy = false; cfg.done = false;
+  const row = sec.lastChild, seen = {};
+  let page = 0, busy = false, done = false;
   const load = async () => {
-    if (cfg.busy || cfg.done) return;
-    cfg.busy = true;
+    if (busy || done) return;
+    busy = true;
     try {
-      const d = await api(cfg.p, Object.assign({ sort_by: 'popularity.desc', page: cfg.page + 1 }, cfg.q));
-      cfg.page++; cfg.done = cfg.page >= d.total_pages || cfg.page >= 30;
-      const list = d.results.filter(x => x.poster_path);
-      list.forEach(x => { x.media = cfg.type; row.appendChild(card(x)); });
-      if (cfg.hero && cfg.page === 1) {
-        const h = list.find(x => x.backdrop_path && x.overview);
-        if (h && heroItems.length < 3) { heroItems.push(h); if (heroItems.length === 1) updateHero(); }
+      const d = await cfg.load(page + 1);
+      page++; done = !d.more || page >= 40;
+      d.items.forEach(it => { if (!seen[it.id]) { seen[it.id] = 1; row.appendChild(card(it)); } });
+      if (cfg.hero && page === 1) {
+        d.items.filter(x => x.banner && x.desc).slice(0, 3).forEach(x => heroItems.push(x));
+        updateHero();
       }
+      if (!row.children.length) row.innerHTML = '<div class="empty">Rien à afficher ici pour le moment.</div>';
     } catch (e) {
-      if (!row.children.length) row.innerHTML = '<div class="empty">Impossible de charger cette liste. Vérifie ta connexion et ta clé.</div>';
-      cfg.done = true;
+      if (!row.children.length) row.innerHTML = '<div class="empty">Chargement impossible. Vérifie ta connexion puis recharge la page.</div>';
+      done = true;
     }
-    cfg.busy = false;
+    busy = false;
   };
   row.addEventListener('scroll', () => { if (row.scrollLeft + row.clientWidth > row.scrollWidth - 300) load(); });
   load();
   return sec;
 }
 
-/* ---------- Bannière ---------- */
+/* ================= Bannière ================= */
 let heroIdx = 0;
-function updateHero() {
+async function updateHero() {
   const h = heroItems[heroIdx]; if (!h) return;
-  $('hero-banner').style.backgroundImage = `url('${BACK + h.backdrop_path}')`;
-  $('hero-badge').textContent = h.media === 'movie' ? '🎬 FILM' : (h.original_language === 'ja' ? '⚔️ ANIMÉ' : '🇰🇷 DRAMA CORÉEN');
-  $('hero-title').textContent = h.title || h.name;
-  $('hero-desc').textContent = h.overview;
+  $('hero-banner').style.backgroundImage = `url('${h.banner}')`;
+  $('hero-badge').textContent = '⚔️ ANIMÉ';
+  $('hero-title').textContent = h.title;
   for (let i = 0; i < 3; i++) $('dot' + i).classList.toggle('active', i === heroIdx);
+  const idx = heroIdx, short = plain(h.desc).slice(0, 300);
+  $('hero-desc').textContent = '…';
+  const fr = await toFr(short);
+  if (idx === heroIdx) $('hero-desc').textContent = fr;
 }
-setInterval(() => { if (heroItems.length > 1) { heroIdx = (heroIdx + 1) % heroItems.length; updateHero(); } }, 4500);
+setInterval(() => { if (heroItems.length > 1) { heroIdx = (heroIdx + 1) % heroItems.length; updateHero(); } }, 6000);
 function heroDetail() { if (heroItems[heroIdx]) openDetail(heroItems[heroIdx]); }
 
-/* ---------- Recherche (dramas/films coréens + animés uniquement) ---------- */
+/* ================= Recherche réelle ================= */
 let searchTimer, searchSeq = 0;
 $('searchInput').addEventListener('input', e => {
   clearTimeout(searchTimer);
   const q = e.target.value.trim();
-  searchTimer = setTimeout(() => runSearch(q), 400);
+  searchTimer = setTimeout(() => runSearch(q), 450);
 });
 
 async function runSearch(q) {
   const seq = ++searchSeq;
-  if (!key) return;
   $('home').style.display = q ? 'none' : '';
   $('results-wrap').style.display = q ? '' : 'none';
   if (!q) return;
   const box = $('results');
-  box.innerHTML = '<div class="empty">Recherche…</div>';
-  try {
-    const pages = await Promise.all([1, 2, 3].map(p => api('/search/multi', { query: q, page: p, include_adult: 'false' }).catch(() => ({ results: [] }))));
-    if (seq !== searchSeq) return;
-    const seen = {}, list = [];
-    pages.forEach(d => d.results.forEach(x => {
-      if ((x.media_type !== 'tv' && x.media_type !== 'movie') || !x.poster_path || seen[x.media_type + x.id]) return;
-      const ok = x.original_language === 'ko' || (x.original_language === 'ja' && (x.genre_ids || []).includes(16));
-      if (ok) { seen[x.media_type + x.id] = 1; x.media = x.media_type; list.push(x); }
-    }));
-    $('results-title').textContent = `Résultats pour « ${q} »`;
-    box.innerHTML = '';
-    if (!list.length) box.innerHTML = '<div class="empty">Aucun drama ou film coréen, ni animé trouvé pour cette recherche.</div>';
-    list.forEach(x => box.appendChild(card(x)));
-  } catch (e) {
-    box.innerHTML = '<div class="empty">La recherche a échoué. Vérifie ta connexion et ta clé.</div>';
+  $('results-title').textContent = `Résultats pour « ${q} »`;
+  box.innerHTML = '<div class="empty">Recherche en cours…</div>';
+  let failed = 0;
+  const [anime, korean] = await Promise.all([
+    anilist({ p: 1, s: q, sort: ['SEARCH_MATCH'] }).then(d => d.media.map(alItem).filter(x => x.poster)).catch(() => { failed++; return []; }),
+    wdSearch(q).catch(() => { failed++; return []; })
+  ]);
+  if (seq !== searchSeq) return;
+  box.innerHTML = '';
+  const all = [];
+  for (let i = 0; i < Math.max(anime.length, korean.length); i++) { if (anime[i]) all.push(anime[i]); if (korean[i]) all.push(korean[i]); }
+  if (!all.length) { box.innerHTML = `<div class="empty">${failed === 2 ? 'La recherche a échoué. Vérifie ta connexion.' : 'Aucun animé, drama ou film coréen trouvé.'}</div>`; return; }
+  all.forEach(it => box.appendChild(card(it)));
+}
+
+/* ================= Fiche détaillée ================= */
+let modalSeq = 0;
+function showModal(html) { modalSeq++; $('modal-body').innerHTML = html; $('modal').style.display = 'flex'; return modalSeq; }
+function closeModal() { modalSeq++; $('modal-body').innerHTML = ''; $('modal').style.display = 'none'; }
+
+function link(box, label, href) { const a = document.createElement('a'); a.className = 'btn alt'; a.textContent = label; a.href = href; a.target = '_blank'; a.rel = 'noopener'; box.appendChild(a); }
+
+async function openDetail(it) {
+  const seq = showModal(`<div id="trailer"></div><div class="head"><img alt=""><div><h3></h3><div class="meta"></div></div></div><p class="syn" id="syn">Chargement du résumé en français…</p><div class="actions" id="acts"></div><b style="font-size:14px">📺 Où regarder</b><div class="actions" id="watch"></div>`);
+  const body = $('modal-body'), img = body.querySelector('img'), ph = placeholder(it.title);
+  img.src = it.poster || ph; img.onerror = () => { img.onerror = null; img.src = ph; };
+  body.querySelector('h3').textContent = it.title;
+  body.querySelector('.meta').textContent = [it.tag, it.year, it.score ? '★ ' + it.score : '', it.extra].filter(Boolean).join(' • ');
+
+  const acts = $('acts'), watch = $('watch');
+  if (it.src === 'al' && it.trailer && it.trailer.site === 'youtube') {
+    const b = document.createElement('button'); b.className = 'btn'; b.textContent = '▶ Bande-annonce';
+    b.onclick = () => { $('trailer').innerHTML = `<iframe class="frame" src="https://www.youtube.com/embed/${enc(it.trailer.id)}?autoplay=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`; };
+    acts.appendChild(b);
+  } else {
+    link(acts, '▶ Bande-annonce (YouTube)', 'https://www.youtube.com/results?search_query=' + enc(it.title + ' bande annonce vf'));
   }
-}
-
-/* ---------- Fenêtre (fiche / lecteur) ---------- */
-function showModal(html) { $('modal-body').innerHTML = html; $('modal').style.display = 'flex'; }
-function closeModal() { $('modal-body').innerHTML = ''; $('modal').style.display = 'none'; }
-
-async function openDetail(x) {
-  showModal('<p class="empty" style="margin-top:20px">Chargement de la fiche…</p>');
-  try {
-    const d = await api(`/${x.media}/${x.id}`, { append_to_response: 'videos,watch/providers', include_video_language: 'fr,en' });
-    const title = d.title || d.name, year = (d.release_date || d.first_air_date || '').slice(0, 4);
-    const vids = (d.videos && d.videos.results) || [];
-    const tr = vids.find(v => v.site === 'YouTube' && v.type === 'Trailer') || vids.find(v => v.site === 'YouTube');
-    const fr = (((d['watch/providers'] || {}).results) || {}).FR || {};
-    const groups = [['flatrate', 'Abonnement'], ['free', 'Gratuit'], ['ads', 'Gratuit avec pub'], ['rent', 'Location'], ['buy', 'Achat']];
-    let prov = '';
-    groups.forEach(([k, l]) => {
-      if (fr[k] && fr[k].length) prov += `<div class="prov-group"><b>${l}</b><div class="prov">${fr[k].map(p => `<span class="chip"><img src="${LOGO + p.logo_path}" alt="">${esc(p.provider_name)}</span>`).join('')}</div></div>`;
-    });
-    if (!prov) prov = '<p class="empty">Pas de plateforme référencée en France pour l\'instant.</p>';
-    const meta = [year, d.runtime ? d.runtime + ' min' : (d.number_of_seasons ? d.number_of_seasons + ' saison' + (d.number_of_seasons > 1 ? 's' : '') : ''), d.vote_average ? '★ ' + d.vote_average.toFixed(1) : '', (d.genres || []).map(g => g.name).join(', ')].filter(Boolean).join(' • ');
-    showModal(`
-      <div id="trailer"></div>
-      <div class="head">
-        <img src="${d.poster_path ? IMG + d.poster_path : placeholder(title)}" alt="">
-        <div><h3>${esc(title)}</h3><div class="meta">${esc(meta)}</div></div>
-      </div>
-      <p class="syn">${esc(d.overview || 'Synopsis non disponible en français.')}</p>
-      <div class="actions">
-        ${tr ? `<button class="btn" onclick="playTrailer('${esc(tr.key)}')">▶ Bande-annonce</button>` : ''}
-        ${fr.link ? `<a class="btn alt" href="${esc(fr.link)}" target="_blank" rel="noopener">Toutes les offres en France</a>` : ''}
-      </div>
-      <b style="font-size:14px">📺 Où regarder en France</b>${prov}`);
-  } catch (e) {
-    showModal('<p class="empty" style="margin-top:20px">Impossible de charger la fiche. Réessaie.</p>');
+  if (it.src === 'al') {
+    const seen = {};
+    it.links.filter(l => l.type === 'STREAMING' && !seen[l.site] && (seen[l.site] = 1)).sort((a, b) => (b.language === 'French') - (a.language === 'French')).forEach(l => link(watch, l.site + (l.language === 'French' ? ' 🇫🇷' : ''), l.url));
   }
+  link(watch, 'Toutes les offres en France', 'https://www.justwatch.com/fr/recherche?q=' + enc(it.title));
+
+  // Résumé en français
+  let text = '';
+  try {
+    if (it.src === 'al') {
+      text = await toFr(plain(it.desc));
+    } else if (it.art) {
+      const t = it.art.split('/wiki/')[1];
+      const r = await fetch('https://fr.wikipedia.org/api/rest_v1/page/summary/' + t);
+      if (r.ok) text = (await r.json()).extract || '';
+    }
+  } catch (e) {}
+  if (!text) text = it.desc || 'Résumé non disponible en français.';
+  if (seq === modalSeq && $('syn')) $('syn').textContent = text;
 }
 
-function playTrailer(k) {
-  $('trailer').innerHTML = `<iframe class="frame" src="https://www.youtube.com/embed/${encodeURIComponent(k)}?autoplay=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
-}
-
-/* ---------- Mes vidéos (lecture + téléchargement) ---------- */
+/* ================= Mes vidéos (lecture + téléchargement) ================= */
 let mine = [];
 try { mine = JSON.parse(store.get('jm_mine') || '[]'); } catch (e) { mine = []; }
-const session = []; // fichiers locaux (valables jusqu'à la fermeture de la page)
+const session = [];
 
 function renderMine() {
   const box = $('mine-list'); box.innerHTML = '';
@@ -316,14 +367,12 @@ function renderMine() {
     box.appendChild(r);
   });
 }
-
 function playMine(v) {
   showModal('<h3 style="margin:10px 0 12px;font-size:15px"></h3><video class="frame" id="mv" controls playsinline autoplay></video><p class="err" id="mv-err"></p>');
   $('modal-body').querySelector('h3').textContent = v.name;
   const vid = $('mv'); vid.src = v.url;
   vid.onerror = () => { $('mv-err').textContent = 'Lecture impossible : le lien est invalide ou le serveur bloque la lecture.'; };
 }
-
 function addUrl() {
   const u = $('urlInput').value.trim();
   if (!/^https?:\/\//i.test(u)) { $('urlInput').focus(); return; }
@@ -332,35 +381,16 @@ function addUrl() {
   mine.push({ name, url: u }); store.set('jm_mine', JSON.stringify(mine));
   $('urlInput').value = ''; renderMine();
 }
-
 function addFile(inp) {
   const f = inp.files[0]; if (!f) return;
   session.push({ name: f.name, url: URL.createObjectURL(f) });
   inp.value = ''; renderMine();
 }
 
-/* ---------- Clé & démarrage ---------- */
-async function saveKey() {
-  const k = $('keyInput').value.trim();
-  if (!k) return;
-  key = k; $('keyErr').textContent = 'Vérification…';
-  try { await api('/configuration'); store.set('jm_tmdb', k); $('keyErr').textContent = ''; start(); }
-  catch (e) { key = ''; $('keyErr').textContent = 'Clé refusée. Vérifie-la et réessaie.'; }
-}
-function resetKey() { store.del('jm_tmdb'); location.reload(); }
-
-function start() {
-  $('setup').style.display = 'none';
-  $('home').style.display = '';
-  const cat = $('catalog'); cat.innerHTML = '';
-  heroItems.length = 0;
-  ROWS.forEach(cfg => cat.appendChild(buildRow(cfg)));
-}
-
 window.onload = () => {
   renderMine();
-  if (!key) { $('home').style.display = 'none'; $('setup').style.display = ''; }
-  else start();
+  const cat = $('catalog');
+  ROWS.forEach(cfg => cat.appendChild(buildRow(cfg)));
 };
 </script>
 </body>
