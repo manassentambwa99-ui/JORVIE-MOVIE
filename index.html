@@ -125,7 +125,7 @@ footer { margin: 28px 16px 0; font-size: 10px; color: #7d7d8c; line-height: 1.5;
   <p class="empty" id="mine-space"></p>
 </div>
 
-<footer>Données : AniList (animés), Wikidata et Wikipédia FR (dramas et films coréens), traduction MyMemory. Les épisodes se regardent sur les plateformes officielles indiquées dans chaque fiche.</footer>
+<footer>Données : AniList (animés), Wikidata et Wikipédia FR (dramas et films coréens), traduction MyMemory. Lecture intégrée en local dans l'application.</footer>
 
 <div id="modal" onclick="if(event.target===this)closeModal()">
   <div class="sheet glass"><button class="close-btn" onclick="closeModal()">✕ Fermer</button><div id="modal-body"></div></div>
@@ -321,8 +321,7 @@ async function runSearch(q) {
   $('home').style.display = q ? 'none' : '';
   $('results-wrap').style.display = q ? '' : 'none';
   if (!q) return;
-  const box = $('results');
-  $('results-title').textContent = `Résultats pour « ${q} »`;
+  const box = $('results');$('results-title').textContent = `Résultats pour « ${q} »`;
   box.innerHTML = '<div class="empty">Recherche en cours…</div>';
   let failed = 0;
   const [anime, korean] = await Promise.all([
@@ -338,32 +337,37 @@ async function runSearch(q) {
   frenchify(anime);
 }
 
-/* ================= Fiche détaillée ================= */
+/* ================= Fiche détaillée & Lecture dans l'appli ================= */
 let modalSeq = 0;
 function showModal(html) { modalSeq++; $('modal-body').innerHTML = html; $('modal').style.display = 'flex'; return modalSeq; }
-function closeModal() { if (curObj) { URL.revokeObjectURL(curObj); curObj = null; } modalSeq++; $('modal-body').innerHTML = ''; $('modal').style.display = 'none'; }
-
-function link(box, label, href) { const a = document.createElement('a'); a.className = 'btn alt'; a.textContent = label; a.href = href; a.target = '_blank'; a.rel = 'noopener'; box.appendChild(a); }
+function closeModal() { if (curObj) { URL.revokeObjectURL(curObj); curObj = null; } modalSeq++; $('modal-body').innerHTML = '';$('modal').style.display = 'none'; }
 
 async function openDetail(it) {
-  const seq = showModal(`<div id="trailer"></div><div class="head"><img alt=""><div><h3></h3><div class="meta"></div></div></div><p class="syn" id="syn">Chargement du résumé en français…</p><div class="actions" id="acts"></div><b style="font-size:14px">📺 Où regarder</b><div class="actions" id="watch"></div>`);
+  const seq = showModal(`<div id="trailer"></div><div class="head"><img alt=""><div><h3></h3><div class="meta"></div></div></div><p class="syn" id="syn">Chargement du résumé en français…</p><div class="actions" id="acts"></div><b style="font-size:14px">📺 Regarder l'épisode dans l'appli</b><div class="actions" id="watch"></div>`);
   const body = $('modal-body'), img = body.querySelector('img'), ph = placeholder(it.title);
   img.src = it.poster || ph; img.onerror = () => { img.onerror = null; img.src = ph; };
   body.querySelector('h3').textContent = it.title;
   body.querySelector('.meta').textContent = [it.tag, it.year, it.score ? '★ ' + it.score : '', it.extra].filter(Boolean).join(' • ');
 
-  const acts = $('acts'), watch = $('watch');
+  const acts = $('acts'), watch =$('watch');
   const tid = it.src === 'al' ? (it.trailer && it.trailer.site === 'youtube' ? it.trailer.id : '') : (it.yt || '');
   if (tid) {
     const b = document.createElement('button'); b.className = 'btn'; b.textContent = '▶ Bande-annonce';
     b.onclick = () => { $('trailer').innerHTML = `<iframe class="frame" src="https://www.youtube.com/embed/${enc(tid)}?autoplay=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`; };
     acts.appendChild(b);
   }
-  if (it.src === 'al') {
-    const seen = {};
-    it.links.filter(l => l.type === 'STREAMING' && !seen[l.site] && (seen[l.site] = 1)).sort((a, b) => (b.language === 'French') - (a.language === 'French')).forEach(l => link(watch, l.site + (l.language === 'French' ? ' 🇫🇷' : ''), l.url));
+
+  // Vérifier si une vidéo locale correspond dans la bibliothèque
+  const localMatch = lib.find(x => x.name.toLowerCase().includes(it.title.toLowerCase()));
+  if (localMatch) {
+    const btnPlayLocal = document.createElement('button');
+    btnPlayLocal.className = 'btn';
+    btnPlayLocal.textContent = '▶ REGARDER DANS L\'APPLI (VF)';
+    btnPlayLocal.onclick = () => playMine(localMatch.id);
+    watch.appendChild(btnPlayLocal);
+  } else {
+    watch.innerHTML = `<div class="empty">Pour lire cet épisode/film en local dans l'appli en VF, ajoute son fichier vidéo ou son lien direct dans <b>"Ma bibliothèque hors ligne"</b> en bas de la page.</div>`;
   }
-  link(watch, 'Toutes les offres en France', 'https://www.justwatch.com/fr/recherche?q=' + enc(it.title));
 
   // Résumé en français
   let text = '';
@@ -376,10 +380,10 @@ async function openDetail(it) {
   } catch (e) {}
   if (!text && it.src === 'al') { try { text = await toFr(plain(it.desc)); } catch (e) {} }
   if (!text) text = it.desc || 'Résumé non disponible en français.';
-  if (seq === modalSeq && $('syn')) $('syn').textContent = text;
+  if (seq === modalSeq && $('syn'))$('syn').textContent = text;
 }
 
-/* ================= Bibliothèque hors ligne (lecture + téléchargement dans l'application) ================= */
+/* ================= Bibliothèque hors ligne ================= */
 const IDB = {
   db: null,
   open() {
@@ -414,8 +418,8 @@ let curObj = null;
 const fmtSize = b => b >= 1e9 ? (b / 1e9).toFixed(2) + ' Go' : (b / 1e6).toFixed(1) + ' Mo';
 const newId = () => 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const labelOf = v => v.name + (v.season || v.ep ? ' — ' + (v.season ? 'Saison ' + v.season : '') + (v.season && v.ep ? ', ' : '') + (v.ep ? 'Épisode ' + v.ep : '') : '');
-const fields = () => ({ season: +$('seasonInput').value || '', ep: +$('epInput').value || '' });
-const clearFields = () => { ['nameInput', 'seasonInput', 'epInput', 'urlInput'].forEach(i => { $(i).value = ''; }); $('mine-msg').textContent = ''; };
+const fields = () => ({ season: +$('seasonInput').value \vert{}\vert{} '', ep: +$('epInput').value || '' });
+const clearFields = () => { ['nameInput', 'seasonInput', 'epInput', 'urlInput'].forEach(i => { $(i).value = ''; });$('mine-msg').textContent = ''; };
 
 async function fetchBlob(url, onp) {
   const r = await fetch(url);
@@ -515,15 +519,14 @@ function addUrl() {
   if (!/^https?:\/\//i.test(u)) { $('mine-msg').textContent = 'Colle un lien qui commence par http:// ou https://'; return; }
   let nm = u.split('?')[0].split('/').pop() || 'Vidéo';
   try { nm = decodeURIComponent(nm); } catch (e) {}
-  lib.push(Object.assign({ id: newId(), name: $('nameInput').value.trim() || nm.replace(/\.[^.]+$/, ''), url: u, offline: false }, fields()));
+  lib.push(Object.assign({ id: newId(), name: $('nameInput').value.trim() \vert{}\vert{} nm.replace(/\.[^.]+$/, ''), url: u, offline: false }, fields()));
   saveLib(); clearFields(); renderMine();
 }
 
 async function addFile(inp) {
   const f = inp.files[0]; inp.value = '';
   if (!f) return;
-  const v = Object.assign({ id: newId(), name: $('nameInput').value.trim() || f.name.replace(/\.[^.]+$/, ''), offline: false }, fields());
-  $('mine-msg').textContent = 'Enregistrement dans l\'application…';
+  const v = Object.assign({ id: newId(), name: $('nameInput').value.trim() || f.name.replace(/\.[^.]+$/, ''), offline: false }, fields());$('mine-msg').textContent = 'Enregistrement dans l\'application…';
   try {
     await IDB.put(v.id, f);
     v.offline = true; v.size = f.size; lib.push(v); saveLib(); clearFields();
@@ -538,8 +541,7 @@ window.onload = () => {
   renderMine();
   ['Romance', 'Comédie', 'Action', 'Fantastique', 'Drame', 'Aventure', 'Horreur', 'Mystère', 'Science-fiction', 'Surnaturel', 'Sport'].forEach(t => {
     const c = document.createElement('div'); c.className = 'chip2 glass'; c.textContent = t;
-    c.onclick = () => { $('searchInput').value = t; runSearch(t); window.scrollTo(0, 0); };
-    $('chips').appendChild(c);
+    c.onclick = () => { $('searchInput').value = t; runSearch(t); window.scrollTo(0, 0); };$('chips').appendChild(c);
   });
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) navigator.serviceWorker.register('sw.js').catch(() => {});
   const cat = $('catalog');
