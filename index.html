@@ -2,12 +2,19 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JORVIE MOVIE - Catalogue</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>JORVIE MOVIE</title>
     <meta name="theme-color" content="#0d0d11">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background: #0d0d11; color: #fff; padding-bottom: 50px; -webkit-tap-highlight-color: transparent; }
+        button { color: inherit; }
+        :focus-visible { outline: 3px solid #ff5a66; outline-offset: 2px; }
 
         /* Halos flous en arrière-plan */
         .ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
@@ -20,26 +27,32 @@
 
         /* En-tête collant : logo + recherche + onglets */
         header {
-            position: sticky; top: 0; z-index: 100;
+            position: sticky; top: 0; z-index: 100; padding-top: env(safe-area-inset-top);
             background: linear-gradient(180deg, rgba(30, 30, 40, 0.68), rgba(14, 14, 20, 0.5));
             backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%);
             border-bottom: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
         }
-        .top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px 8px; }
+        .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px 8px; }
         .logo-box { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         .logo-icon { width: 26px; height: 26px; background: #ff2a39; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; box-shadow: 0 0 10px rgba(255, 42, 57, 0.6); }
         .logo { font-size: 17px; font-weight: 900; color: #ff2a39; letter-spacing: 0.8px; text-shadow: 0 0 12px rgba(255, 42, 57, 0.4); }
+        .top-right { display: flex; align-items: center; gap: 6px; min-width: 0; }
         .search-box input {
             background: rgba(255, 255, 255, 0.10); border: 1px solid rgba(255, 255, 255, 0.16); color: #fff;
-            padding: 8px 14px; border-radius: 20px; font-size: 13px; outline: none; width: 150px;
+            padding: 8px 14px; border-radius: 20px; font-size: 13px; outline: none; width: 130px;
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); transition: width .3s, border-color .3s, box-shadow .3s;
         }
         .search-box input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        .search-box input:focus { width: 190px; border-color: rgba(255, 42, 57, 0.7); box-shadow: 0 0 0 3px rgba(255, 42, 57, 0.18); }
+        .search-box input:focus { width: 170px; border-color: rgba(255, 42, 57, 0.7); box-shadow: 0 0 0 3px rgba(255, 42, 57, 0.18); }
+        .icon-btn {
+            flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 15px; line-height: 1;
+            background: rgba(255, 255, 255, 0.10); border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        }
+        #install-btn { display: none; width: auto; padding: 0 11px; font-size: 11px; font-weight: 800; background: rgba(255, 42, 57, 0.85); }
 
         .tabs { display: flex; gap: 8px; padding: 4px 16px 8px; overflow-x: auto; scrollbar-width: none; }
-        .tabs::-webkit-scrollbar { display: none; }
+        .tabs::-webkit-scrollbar, .sorts::-webkit-scrollbar { display: none; }
         .tab, .chip-sort {
             flex-shrink: 0; cursor: pointer; color: #ddd; font-weight: 700; border-radius: 20px;
             background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.14);
@@ -51,10 +64,34 @@
             color: #fff; background: linear-gradient(135deg, rgba(229, 9, 20, 0.9), rgba(255, 42, 57, 0.8));
             border-color: rgba(255, 255, 255, 0.28); box-shadow: 0 4px 14px rgba(229, 9, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
-        .sorts { display: flex; gap: 8px; padding: 0 16px 10px; }
+        .sorts { display: flex; align-items: center; gap: 8px; padding: 0 16px 10px; overflow-x: auto; scrollbar-width: none; }
+        select.glass {
+            background: rgba(255, 255, 255, 0.10); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px;
+            padding: 6px 10px; font-size: 12px; outline: none; max-width: 100%;
+        }
+        select.glass option { color: #111; }
+        .sorts select.glass { margin-left: auto; flex-shrink: 0; }
+
+        /* Accueil : bannière + rangées */
+        main { position: relative; z-index: 1; padding: 16px; }
+        #home { margin: -16px -16px 0; }
+        .hero {
+            margin: 16px 16px 18px; border-radius: 20px; overflow: hidden; position: relative; min-height: 240px; cursor: pointer;
+            background: #181822 center / cover; border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+        .hero-in { position: absolute; inset: 0; padding: 16px; display: flex; flex-direction: column; justify-content: flex-end; background: linear-gradient(180deg, rgba(13, 13, 17, 0) 15%, rgba(13, 13, 17, 0.94)); }
+        .hero h2 { font-size: 21px; font-weight: 900; }
+        .hero p { font-size: 12px; color: #ccc; margin: 4px 0 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .row { margin-bottom: 20px; }
+        .row-h { display: flex; justify-content: space-between; align-items: baseline; padding: 0 16px; margin-bottom: 10px; }
+        .row-h h3 { font-size: 15px; font-weight: 800; }
+        .more-link { background: none; border: 0; color: #ff5a66; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .strip { display: flex; gap: 12px; overflow-x: auto; padding: 0 16px 6px; scrollbar-width: none; scroll-snap-type: x proximity; }
+        .strip::-webkit-scrollbar { display: none; }
+        .strip .card { flex: 0 0 128px; scroll-snap-align: start; }
+        .keybanner { margin: 0 16px 18px; font-size: 12px; line-height: 1.5; color: #d6d6df; }
 
         /* Grille */
-        main { position: relative; z-index: 1; padding: 16px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
         .card {
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
@@ -74,6 +111,8 @@
         }
         .badge.score { right: 6px; }
         .badge.play { left: 6px; background: rgba(229, 9, 20, 0.75); }
+        .prog { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, 0.25); }
+        .prog i { display: block; height: 100%; background: #ff2a39; }
         .card-info { padding: 8px 9px 10px; background: rgba(255, 255, 255, 0.04); border-top: 1px solid rgba(255, 255, 255, 0.08); }
         .card-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .card-sub { font-size: 10px; color: #9a9aa6; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -87,7 +126,7 @@
         .sk-line.short { width: 60%; }
         @keyframes shimmer { to { background-position: -200% 0; } }
 
-        #status { text-align: center; font-size: 13px; color: rgba(255,255,255,0.6); padding: 24px 10px; display: none; }
+        #status { text-align: center; font-size: 13px; color: rgba(255,255,255,0.6); padding: 24px 10px; display: none; line-height: 1.5; }
         #more {
             display: none; margin: 22px auto 0; padding: 11px 28px; font-size: 13px; font-weight: 800; color: #fff; cursor: pointer; border-radius: 25px;
             background: linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05)); border: 1px solid rgba(255,255,255,0.2);
@@ -97,19 +136,20 @@
         /* Fiche détail */
         #detail {
             display: none; position: fixed; inset: 0; z-index: 1000; flex-direction: column;
-            background: rgba(4, 4, 8, 0.82); backdrop-filter: blur(26px) saturate(150%); -webkit-backdrop-filter: blur(26px) saturate(150%);
+            background: rgba(4, 4, 8, 0.86); backdrop-filter: blur(26px) saturate(150%); -webkit-backdrop-filter: blur(26px) saturate(150%);
         }
         .d-head {
-            display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 18px;
+            display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 18px; padding-top: calc(14px + env(safe-area-inset-top));
             background: linear-gradient(180deg, rgba(40, 40, 52, 0.6), rgba(20, 20, 26, 0.45));
             border-bottom: 1px solid rgba(255, 255, 255, 0.14);
         }
         .d-head h2 { font-size: 15px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .close-btn { background: rgba(255, 42, 57, 0.9); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; flex-shrink: 0; }
-        .d-body { flex: 1; overflow-y: auto; padding-bottom: 24px; }
-        .trailer-wrap { width: 100%; aspect-ratio: 16 / 9; background: #000; position: relative; }
+        .d-body { flex: 1; overflow-y: auto; padding-bottom: 40px; max-width: 760px; width: 100%; margin: 0 auto; }
+        .trailer-wrap { width: 100%; aspect-ratio: 16 / 9; background: #000 center / cover; position: relative; }
         .trailer-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
-        .no-trailer { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; font-size: 13px; color: #bbb; background: radial-gradient(circle at 30% 20%, rgba(255,42,57,0.2), transparent 55%), #12121a; }
+        .no-trailer { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; text-align: center; padding: 20px; font-size: 13px; color: #bbb; background: radial-gradient(circle at 30% 20%, rgba(255,42,57,0.2), transparent 55%), #12121a; }
+        .big-play { width: 66px; height: 66px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.35); background: rgba(229, 9, 20, 0.88); font-size: 26px; cursor: pointer; box-shadow: 0 6px 24px rgba(255, 42, 57, 0.5); }
         .panel {
             margin: 14px 14px 0; padding: 14px; border-radius: 16px;
             background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04)); border: 1px solid rgba(255,255,255,0.14);
@@ -119,32 +159,67 @@
         .d-title { font-size: 17px; font-weight: 900; }
         .d-orig { font-size: 12px; color: #9a9aa6; margin-top: 2px; }
         .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-        .chip { font-size: 10px; font-weight: 700; padding: 4px 9px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16); }
-        .syn-title { font-size: 12px; font-weight: 800; color: #ff5a66; margin-bottom: 6px; letter-spacing: .5px; }
+        .chip { font-size: 10px; font-weight: 700; padding: 4px 9px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16); color: #fff; text-decoration: none; }
+        a.chip { background: rgba(255, 42, 57, 0.22); border-color: rgba(255, 42, 57, 0.5); }
+        .syn-title { font-size: 12px; font-weight: 800; color: #ff5a66; margin-bottom: 8px; letter-spacing: .5px; }
         .syn { font-size: 13px; line-height: 1.55; color: #d6d6df; white-space: pre-line; user-select: text; }
-        .note { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 8px; }
+        .note { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 8px; line-height: 1.5; }
         .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
         .btn {
             font-size: 12px; font-weight: 800; color: #fff; text-decoration: none; cursor: pointer; padding: 8px 16px; border-radius: 20px;
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15); display: inline-block;
         }
         .btn.red { background: rgba(255, 42, 57, 0.85); box-shadow: 0 4px 14px rgba(255, 42, 57, 0.4); }
         .btn[disabled] { opacity: .6; pointer-events: none; }
+        .btn-col { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .btn-col .btn { text-align: left; }
 
-        /* Clé TMDB (affichée seulement si besoin) */
-        #key-setup { display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; padding: 20px; background: rgba(4,4,8,0.7); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
-        .key-card { width: 100%; max-width: 360px; padding: 22px; border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)); border: 1px solid rgba(255,255,255,0.18); box-shadow: 0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.22); }
+        .eps-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .eps-count { font-size: 11px; color: #9a9aa6; }
+        .ep { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.08); align-items: flex-start; }
+        .ep img { width: 104px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; flex-shrink: 0; background: #181822; }
+        .ep-num { width: 34px; flex-shrink: 0; font-weight: 900; color: #ff5a66; font-size: 14px; padding-top: 2px; }
+        .ep-txt { flex: 1; min-width: 0; }
+        .ep-t { font-size: 13px; font-weight: 700; }
+        .ep-m { font-size: 10px; color: #9a9aa6; margin-top: 2px; }
+        .ep-o { font-size: 11px; color: #c9c9d3; margin-top: 4px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .ep-seen { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); font-size: 13px; }
+        .ep.done .ep-seen { background: rgba(255, 42, 57, 0.85); }
+        .ep.done .ep-t { color: #9a9aa6; }
+        .cast { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
+        .cast::-webkit-scrollbar { display: none; }
+        .cast figure { flex: 0 0 72px; text-align: center; }
+        .cast img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: #181822; border: 1px solid rgba(255,255,255,0.18); }
+        .cast figcaption { font-size: 10px; margin-top: 4px; line-height: 1.3; color: #d6d6df; }
+        .cast figcaption small { display: block; color: #8c8c98; }
+
+        /* Lecteur */
+        #player { display: none; position: fixed; inset: 0; z-index: 1500; background: #000; flex-direction: column; }
+        #player.open { display: flex; }
+        .p-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; padding-top: calc(10px + env(safe-area-inset-top)); background: rgba(14, 14, 20, 0.95); }
+        .p-bar span { flex: 1; min-width: 0; font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #vid { flex: 1; min-height: 0; width: 100%; background: #000; }
+        #p-msg { display: none; position: absolute; left: 16px; right: 16px; top: 80px; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2); font-size: 13px; text-align: center; }
+
+        /* Réglages */
+        #settings { display: none; position: fixed; inset: 0; z-index: 2000; align-items: center; justify-content: center; padding: 16px; background: rgba(4,4,8,0.7); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .key-card { width: 100%; max-width: 400px; max-height: 92vh; overflow-y: auto; padding: 22px; border-radius: 22px; background: linear-gradient(145deg, rgba(40,40,52,0.95), rgba(20,20,28,0.95)); border: 1px solid rgba(255,255,255,0.18); box-shadow: 0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.22); }
         .key-card h3 { font-size: 17px; margin-bottom: 8px; }
-        .key-card p { font-size: 12px; color: #c9c9d3; line-height: 1.5; margin-bottom: 12px; }
+        .key-card h4 { font-size: 12px; color: #ff5a66; letter-spacing: .5px; margin: 16px 0 6px; }
+        .key-card p, .key-card label { font-size: 12px; color: #c9c9d3; line-height: 1.5; display: block; margin-bottom: 6px; }
         .key-card a { color: #ff5a66; }
-        .key-card input { width: 100%; padding: 11px 14px; border-radius: 14px; font-size: 13px; color: #fff; outline: none; margin-bottom: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); }
-        .key-card .row { display: flex; gap: 8px; }
-        .key-card .btn { flex: 1; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
+        .key-card input[type=text], .key-card input[type=password], .key-card input[type=url] { width: 100%; padding: 11px 14px; border-radius: 14px; font-size: 13px; color: #fff; outline: none; margin-bottom: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); }
+        .key-card select.glass { width: 100%; margin-bottom: 10px; padding: 10px 12px; }
+        .key-card .row2 { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+        .key-card .btn { flex: 1; text-align: center; min-width: 120px; }
         #key-error { color: #ff7b85; font-size: 12px; margin-bottom: 8px; display: none; }
+
+        #toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); z-index: 3000; opacity: 0; pointer-events: none; transition: .25s; background: rgba(30,30,40,0.96); border: 1px solid rgba(255,255,255,0.2); padding: 10px 18px; border-radius: 22px; font-size: 13px; max-width: 90vw; text-align: center; }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         .attribution { position: relative; z-index: 1; margin: 10px 16px 0; font-size: 10px; color: rgba(255,255,255,0.4); text-align: center; line-height: 1.6; }
 
-        @media (prefers-reduced-motion: reduce) { .blob, .card.skeleton .card-img, .card.skeleton .sk-line { animation: none; } }
+        @media (prefers-reduced-motion: reduce) { .blob, .card.skeleton .card-img, .card.skeleton .sk-line { animation: none; } * { scroll-behavior: auto !important; } }
     </style>
 </head>
 <body>
@@ -153,82 +228,120 @@
     <header>
         <div class="top">
             <div class="logo-box"><div class="logo-icon">J</div><div class="logo">JORVIE MOVIE</div></div>
-            <div class="search-box"><input type="search" id="searchInput" placeholder="Rechercher…" autocomplete="off"></div>
+            <div class="top-right">
+                <button class="icon-btn" id="install-btn" type="button">⬇ Installer</button>
+                <div class="search-box"><input type="search" id="searchInput" placeholder="Rechercher…" autocomplete="off" list="recents" aria-label="Rechercher"><datalist id="recents"></datalist></div>
+                <button class="icon-btn" id="settings-btn" type="button" aria-label="Réglages">⚙</button>
+            </div>
         </div>
         <div class="tabs" id="tabs">
-            <button class="tab active" data-tab="anime">🎌 Animés</button>
+            <button class="tab active" data-tab="home">🏠 Accueil</button>
+            <button class="tab" data-tab="anime">🎌 Animés</button>
+            <button class="tab" data-tab="animefilm">🎞️ Films d'animation</button>
             <button class="tab" data-tab="movie">🎬 Films coréens</button>
             <button class="tab" data-tab="drama">🇰🇷 Dramas coréens</button>
+            <button class="tab" data-tab="free">🍿 Films complets libres</button>
+            <button class="tab" data-tab="list">❤ Ma liste</button>
         </div>
-        <div class="sorts" id="sorts">
-            <button class="chip-sort active" data-sort="pop">Populaires</button>
-            <button class="chip-sort" data-sort="top">Mieux notés</button>
-            <button class="chip-sort" data-sort="new">Récents</button>
-        </div>
+        <div class="sorts" id="sorts"></div>
     </header>
 
     <main>
+        <div id="home"></div>
         <div class="grid" id="grid"></div>
         <div id="status"></div>
-        <button id="more">Charger plus</button>
+        <button id="more" type="button">Charger plus</button>
     </main>
 
     <p class="attribution">
-        Animés : Jikan API (données MyAnimeList). Films &amp; dramas : ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.<br>
-        Traductions : MyMemory. Bandes-annonces © leurs ayants droit.
+        Animés : Jikan API (MyAnimeList). Films &amp; séries : ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.<br>
+        Films complets libres : Internet Archive (domaine public). Traductions : MyMemory. Bandes-annonces © leurs ayants droit.
     </p>
 
-    <!-- Fiche détail : bande-annonce + résumé -->
-    <div id="detail">
-        <div class="d-head"><h2 id="d-head-title"></h2><button class="close-btn" onclick="closeDetail()">✕ Fermer</button></div>
-        <div class="d-body">
-            <div class="trailer-wrap" id="trailer-wrap"></div>
-            <div class="panel">
-                <div class="d-title" id="d-title"></div>
-                <div class="d-orig" id="d-orig"></div>
-                <div class="chips" id="d-chips"></div>
-            </div>
-            <div class="panel">
-                <div class="syn-title">RÉSUMÉ</div>
-                <div class="syn" id="d-syn"></div>
-                <div class="note" id="d-note"></div>
-                <div class="actions" id="d-actions"></div>
-            </div>
+    <!-- Fiche détail -->
+    <div id="detail" role="dialog" aria-modal="true" aria-label="Fiche du titre">
+        <div class="d-head"><h2 id="d-head-title"></h2><button class="close-btn" id="d-close" type="button">✕ Fermer</button></div>
+        <div class="d-body" id="d-body"></div>
+    </div>
+
+    <!-- Lecteur -->
+    <div id="player" role="dialog" aria-modal="true" aria-label="Lecteur vidéo">
+        <div class="p-bar">
+            <span id="p-title"></span>
+            <select class="glass" id="p-speed" aria-label="Vitesse de lecture">
+                <option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="2">2×</option>
+            </select>
+            <button class="icon-btn" id="p-pip" type="button" aria-label="Image dans l'image" style="display:none">⧉</button>
+            <button class="close-btn" id="p-close" type="button">✕ Fermer</button>
+        </div>
+        <video id="vid" controls playsinline></video>
+        <div id="p-msg"></div>
+    </div>
+
+    <!-- Réglages -->
+    <div id="settings">
+        <div class="key-card">
+            <h3>⚙ Réglages</h3>
+            <div id="key-error"></div>
+            <h4>CLÉ TMDB (GRATUITE)</h4>
+            <p>Films, dramas, animés en français, épisodes, casting, « où regarder ». Clé sur <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer">themoviedb.org → Paramètres → API</a>. Elle reste sur cet appareil.</p>
+            <input type="password" id="key-input" placeholder="Clé API (v3) ou jeton (v4)" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Clé TMDB">
+            <label for="region-select">Pays pour « Où regarder »</label>
+            <select class="glass" id="region-select"></select>
+            <label for="anime-src">Source des animés</label>
+            <select class="glass" id="anime-src">
+                <option value="auto">Automatique (TMDB en français si clé, sinon MyAnimeList)</option>
+                <option value="jikan">Toujours MyAnimeList (Jikan)</option>
+            </select>
+            <div class="row2"><button class="btn red" id="set-save" type="button">Enregistrer</button><button class="btn" id="set-cancel" type="button">Annuler</button></div>
+
+            <h4>MA BIBLIOTHÈQUE</h4>
+            <p>Lis une vidéo de ton appareil ou un lien direct (.mp4, .webm, .m3u8) — uniquement des contenus dont tu détiens les droits.</p>
+            <div class="row2"><button class="btn" id="pick-file" type="button">📁 Fichier de mon appareil</button></div>
+            <input type="file" id="file-input" accept="video/*" hidden>
+            <input type="url" id="url-input" placeholder="https://…/video.mp4" autocomplete="off" aria-label="Lien vidéo direct" style="margin-top:10px">
+            <div class="row2"><button class="btn" id="open-url" type="button">▶ Ouvrir le lien</button></div>
+
+            <h4>DONNÉES</h4>
+            <div class="row2"><button class="btn" id="clr-hist" type="button">Effacer l'historique</button><button class="btn" id="clr-fav" type="button">Vider ma liste</button></div>
         </div>
     </div>
 
-    <!-- Clé TMDB -->
-    <div id="key-setup">
-        <div class="key-card">
-            <h3>🔑 Clé TMDB gratuite</h3>
-            <p>Les films et dramas coréens (en français) viennent de TMDB. Crée une clé API gratuite sur <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer">themoviedb.org → Paramètres → API</a> et colle-la ici. Elle reste sur cet appareil.</p>
-            <div id="key-error"></div>
-            <input type="text" id="key-input" placeholder="Clé API (v3) ou jeton (v4)" autocomplete="off" autocapitalize="off" spellcheck="false">
-            <div class="row">
-                <button class="btn" onclick="cancelKey()">Plus tard</button>
-                <button class="btn red" onclick="saveKey()">Activer</button>
-            </div>
-        </div>
-    </div>
+    <div id="toast" role="status" aria-live="polite"></div>
 
     <script>
+    (function () {
+        'use strict';
+
         // ============ CONFIG ============
-        // Les animés marchent sans clé (Jikan). Pour les films/dramas coréens : clé TMDB gratuite.
-        // Colle-la ici, ou laisse vide : l'app te la demandera.
+        // Colle ta clé TMDB ici (optionnel) ou renseigne-la dans ⚙ Réglages.
         const TMDB_KEY = '';
 
         const JIKAN = 'https://api.jikan.moe/v4';
         const TMDB = 'https://api.themoviedb.org/3';
         const IMG = 'https://image.tmdb.org/t/p/';
+        const IA = 'https://archive.org';
 
         const TABS = {
-            anime: { src: 'jikan' },
-            movie: { src: 'tmdb', media: 'movie', label: 'Film' },
-            drama: { src: 'tmdb', media: 'tv', label: 'Série' }
+            home: { kind: 'home' },
+            anime: { kind: 'anime' },
+            animefilm: { src: 'tmdb', media: 'movie', lang: 'ja', genre: '16', label: 'Film' },
+            movie: { src: 'tmdb', media: 'movie', lang: 'ko', label: 'Film' },
+            drama: { src: 'tmdb', media: 'tv', lang: 'ko', label: 'Série' },
+            free: { src: 'ia' },
+            list: { kind: 'list' }
         };
-
-        const state = { tab: 'anime', sort: 'pop', query: '', page: 1, hasNext: false, items: [], seen: new Set(), rendered: 0, loading: false, token: 0 };
-        const genreCache = {};
+        const SORTS = [['pop', 'Populaires'], ['top', 'Mieux notés'], ['new', 'Récents']];
+        const LIST_SORTS = [['fav', '❤ Ma liste'], ['hist', '🕘 Historique'], ['cont', '▶ À reprendre']];
+        const GENRES = {
+            jikan: [['', 'Tous les genres'], ['1', 'Action'], ['2', 'Aventure'], ['4', 'Comédie'], ['8', 'Drame'], ['10', 'Fantasy'], ['14', 'Horreur'], ['7', 'Mystère'], ['22', 'Romance'], ['24', 'Science-fiction'], ['36', 'Tranche de vie'], ['37', 'Surnaturel'], ['30', 'Sport']],
+            movie: [['', 'Tous les genres'], ['28', 'Action'], ['35', 'Comédie'], ['18', 'Drame'], ['27', 'Horreur'], ['10749', 'Romance'], ['53', 'Thriller'], ['80', 'Crime'], ['14', 'Fantastique'], ['878', 'Science-fiction'], ['16', 'Animation']],
+            tv: [['', 'Tous les genres'], ['10759', 'Action & aventure'], ['35', 'Comédie'], ['18', 'Drame'], ['9648', 'Mystère'], ['10765', 'SF & fantastique'], ['80', 'Crime']],
+            ia: [['', 'Tous les genres'], ['(language:(French) OR language:(fre) OR language:(fra))', 'En français'], ['subject:(horror)', 'Horreur'], ['subject:(comedy)', 'Comédie'], ['subject:(drama)', 'Drame'], ['subject:("science fiction")', 'Science-fiction'], ['subject:(western)', 'Western'], ['subject:("film noir")', 'Film noir']]
+        };
+        const REGIONS = [['FR', 'France'], ['BE', 'Belgique'], ['CH', 'Suisse'], ['CA', 'Canada'], ['CD', 'RD Congo'], ['CG', 'Congo-Brazzaville'], ['CI', "Côte d'Ivoire"], ['SN', 'Sénégal'], ['CM', 'Cameroun'], ['MA', 'Maroc'], ['DZ', 'Algérie'], ['TN', 'Tunisie'], ['US', 'États-Unis'], ['GB', 'Royaume-Uni']];
+        const PROV_TYPES = [['free', 'Gratuit'], ['ads', 'Gratuit (pubs)'], ['flatrate', 'Abonnement'], ['rent', 'Location'], ['buy', 'Achat']];
+        const STATUS_FR = { 'Finished Airing': 'Terminé', 'Currently Airing': 'En cours', 'Not yet aired': 'À venir' };
 
         // ============ OUTILS ============
         const $ = id => document.getElementById(id);
@@ -236,7 +349,22 @@
         function esc(s) {
             return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
-
+        function h(tag, props) {
+            const e = document.createElement(tag);
+            if (props) Object.keys(props).forEach(k => {
+                const v = props[k];
+                if (v == null || v === false) return;
+                if (k === 'class') e.className = v;
+                else if (k === 'text') e.textContent = v;
+                else if (k.slice(0, 2) === 'on') e[k] = v;
+                else e.setAttribute(k, v === true ? '' : v);
+            });
+            for (let i = 2; i < arguments.length; i++) {
+                const kids = [].concat(arguments[i]);
+                kids.forEach(c => { if (c == null || c === false) return; e.append(c.nodeType ? c : document.createTextNode(String(c))); });
+            }
+            return e;
+        }
         async function getJSON(url, opts, retry) {
             if (retry === undefined) retry = 1;
             const r = await fetch(url, opts);
@@ -245,66 +373,60 @@
             if (!r.ok) throw new Error('HTTP ' + r.status);
             return r.json();
         }
-
-        function getKey() {
-            if (TMDB_KEY) return TMDB_KEY;
-            try { return localStorage.getItem('tmdb_key') || ''; } catch (e) { return ''; }
+        let toastTimer;
+        function toast(msg) {
+            const t = $('toast'); t.textContent = msg; t.classList.add('show');
+            clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+        }
+        function placeholder(title) {
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="45%" font-size="40" text-anchor="middle">🎬</text><text x="50%" y="62%" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="13" text-anchor="middle">' + esc(title).slice(0, 24) + '</text></svg>';
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
         }
 
-        function tmdb(path, params) {
+        // ============ STOCKAGE LOCAL ============
+        const LS = {
+            get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+            set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+        };
+        const settings = Object.assign({ key: '', region: 'FR', animeSrc: 'auto' }, LS.get('jm_set', {}));
+        try { const old = localStorage.getItem('tmdb_key'); if (old && !settings.key) settings.key = old; } catch (e) {}
+        let favs = LS.get('jm_fav', []);
+        let hist = LS.get('jm_hist', []);
+        let seen = LS.get('jm_seen', {});
+        let trCache = LS.get('jm_tr', {});
+        let recent = LS.get('jm_recent', []);
+        const getKey = () => TMDB_KEY || settings.key || '';
+        const ik = it => it.src + ':' + (it.media ? it.media + ':' : '') + it.id;
+        function mini(it) {
+            return { src: it.src, media: it.media, id: it.id, title: it.title, original: it.original || '', img: it.img || '', backdrop: it.backdrop || '', year: it.year || '', score: it.score || 0, chips: (it.chips || []).slice(0, 3), fullFree: !!it.fullFree };
+        }
+        const isFav = it => favs.some(f => ik(f) === ik(it));
+        function toggleFav(it) {
+            if (isFav(it)) { favs = favs.filter(f => ik(f) !== ik(it)); toast('Retiré de ma liste'); }
+            else { favs.unshift(mini(it)); toast('Ajouté à ma liste'); }
+            LS.set('jm_fav', favs);
+        }
+        function pushHist(it) {
+            const k = ik(it), old = hist.find(x => x.key === k) || {};
+            hist = hist.filter(x => x.key !== k);
+            hist.unshift({ key: k, item: mini(it), t: Date.now(), pos: old.pos || 0, dur: old.dur || 0, file: old.file || '' });
+            hist = hist.slice(0, 60);
+            LS.set('jm_hist', hist);
+        }
+        const resumable = x => x.dur && x.pos > 10 && x.pos / x.dur < 0.95;
+
+        // ============ TMDB ============
+        function tmdb(path, params, lang) {
             const key = getKey();
             const url = new URL(TMDB + path);
-            const all = Object.assign({ language: 'fr-FR' }, params || {});
+            const all = Object.assign({ language: lang || 'fr-FR' }, params || {});
             Object.keys(all).forEach(k => url.searchParams.set(k, all[k]));
             const opts = {};
             if (key.length > 40) opts.headers = { Authorization: 'Bearer ' + key, accept: 'application/json' };
             else url.searchParams.set('api_key', key);
             return getJSON(url.toString(), opts);
         }
-
-        // ============ ANIMÉS (Jikan) ============
-        const STATUS_FR = { 'Finished Airing': 'Terminé', 'Currently Airing': 'En cours', 'Not yet aired': 'À venir' };
-
-        function cleanSynopsis(t) {
-            return (t || '').replace(/\[Written by[^\]]*\]/gi, '').replace(/\(Source:[^)]*\)/gi, '').trim();
-        }
-
-        function jikanToItem(a) {
-            const jpg = (a.images && a.images.jpg) || {};
-            const chips = [];
-            if (a.type) chips.push(a.type);
-            if (a.episodes) chips.push(a.episodes + ' ép.');
-            if (a.status) chips.push(STATUS_FR[a.status] || a.status);
-            (a.genres || []).slice(0, 3).forEach(g => chips.push(g.name));
-            return {
-                src: 'jikan', id: a.mal_id,
-                title: a.title_english || a.title,
-                original: a.title_japanese || (a.title_english ? a.title : ''),
-                img: jpg.large_image_url || jpg.image_url || '',
-                synopsis: cleanSynopsis(a.synopsis),
-                score: a.score || 0,
-                year: a.year || (a.aired && a.aired.prop && a.aired.prop.from && a.aired.prop.from.year) || '',
-                chips: chips,
-                trailerKey: a.trailer && a.trailer.youtube_id ? a.trailer.youtube_id : '',
-                url: a.url
-            };
-        }
-
-        async function fetchJikan() {
-            const p = new URLSearchParams({ page: state.page, limit: 24, sfw: 'true' });
-            let path;
-            if (state.query) { path = '/anime'; p.set('q', state.query); p.set('order_by', 'popularity'); p.set('sort', 'asc'); }
-            else if (state.sort === 'pop') { path = '/top/anime'; p.set('filter', 'bypopularity'); }
-            else if (state.sort === 'top') { path = '/top/anime'; }
-            else { path = '/seasons/now'; }
-            const d = await getJSON(JIKAN + path + '?' + p.toString());
-            return {
-                items: (d.data || []).filter(a => a.images).map(jikanToItem),
-                hasNext: !!(d.pagination && d.pagination.has_next_page)
-            };
-        }
-
-        // ============ FILMS / DRAMAS CORÉENS (TMDB) ============
+        const genreCache = {};
         async function getGenres(media) {
             if (genreCache[media]) return genreCache[media];
             const d = await tmdb('/genre/' + media + '/list', {});
@@ -313,8 +435,8 @@
             genreCache[media] = map;
             return map;
         }
-
         function tmdbToItem(r, media, label, genres) {
+            genres = genres || {};
             const date = r.release_date || r.first_air_date || '';
             const chips = [label];
             if (date) chips.push(date.slice(0, 4));
@@ -323,148 +445,174 @@
                 src: 'tmdb', media: media, id: r.id,
                 title: r.title || r.name,
                 original: r.original_title || r.original_name || '',
-                img: IMG + 'w342' + r.poster_path,
+                img: r.poster_path ? IMG + 'w342' + r.poster_path : '',
+                backdrop: r.backdrop_path ? IMG + 'w780' + r.backdrop_path : '',
                 synopsis: r.overview || '',
                 score: r.vote_average || 0,
                 year: date.slice(0, 4),
-                chips: chips,
-                trailerKey: null
+                chips: chips
             };
         }
-
-        async function fetchTmdb() {
-            const cfg = TABS[state.tab];
-            const media = cfg.media;
+        async function fetchTmdbP(c, p) {
+            const media = c.media, page = p.page || 1;
             const genres = await getGenres(media).catch(e => { if (e.code === 401) throw e; return {}; });
             let d, results;
-            if (state.query) {
-                d = await tmdb('/search/' + media, { query: state.query, page: state.page, include_adult: 'false' });
-                results = (d.results || []).filter(r => r.original_language === 'ko');
+            if (p.query) {
+                d = await tmdb('/search/' + media, { query: p.query, page: page, include_adult: 'false' });
+                results = (d.results || []).filter(r =>
+                    (!c.lang || r.original_language === c.lang) &&
+                    (!c.genre || (r.genre_ids || []).indexOf(+c.genre) > -1) &&
+                    (!p.genre || (r.genre_ids || []).indexOf(+p.genre) > -1));
             } else {
                 const today = new Date().toISOString().slice(0, 10);
-                const params = { with_original_language: 'ko', page: state.page, include_adult: 'false', 'vote_count.gte': 5 };
-                if (state.sort === 'pop') params.sort_by = 'popularity.desc';
-                else if (state.sort === 'top') { params.sort_by = 'vote_average.desc'; params['vote_count.gte'] = 200; }
+                const q = { page: page, include_adult: 'false', 'vote_count.gte': 5 };
+                if (c.lang) q.with_original_language = c.lang;
+                const g = [c.genre, p.genre].filter(Boolean).join(',');
+                if (g) q.with_genres = g;
+                const sort = p.sort || 'pop';
+                if (sort === 'pop') q.sort_by = 'popularity.desc';
+                else if (sort === 'top') { q.sort_by = 'vote_average.desc'; q['vote_count.gte'] = 200; }
                 else {
-                    params.sort_by = media === 'movie' ? 'primary_release_date.desc' : 'first_air_date.desc';
-                    params[media === 'movie' ? 'primary_release_date.lte' : 'first_air_date.lte'] = today;
+                    q.sort_by = media === 'movie' ? 'primary_release_date.desc' : 'first_air_date.desc';
+                    q[media === 'movie' ? 'primary_release_date.lte' : 'first_air_date.lte'] = today;
+                    q['vote_count.gte'] = 3;
                 }
-                d = await tmdb('/discover/' + media, params);
+                d = await tmdb('/discover/' + media, q);
                 results = d.results || [];
             }
             return {
-                items: results.filter(r => r.poster_path).map(r => tmdbToItem(r, media, cfg.label, genres)),
+                items: results.filter(r => r.poster_path).map(r => tmdbToItem(r, media, c.label, genres)),
                 hasNext: d.page < d.total_pages
             };
         }
 
-        // ============ CHARGEMENT / AFFICHAGE ============
-        function renderSkeleton() {
-            const g = $('grid');
-            g.innerHTML = '';
-            for (let i = 0; i < 6; i++) {
-                const s = document.createElement('div');
-                s.className = 'card skeleton';
-                s.innerHTML = '<div class="card-img"></div><div class="card-info"><div class="sk-line"></div><div class="sk-line short"></div></div>';
-                g.appendChild(s);
-            }
+        // ============ JIKAN (MyAnimeList) ============
+        function cleanSynopsis(t) {
+            return (t || '').replace(/\[Written by[^\]]*\]/gi, '').replace(/\(Source:[^)]*\)/gi, '').trim();
+        }
+        function jikanToItem(a) {
+            const jpg = (a.images && a.images.jpg) || {};
+            const chips = [];
+            if (a.type) chips.push(a.type);
+            if (a.episodes) chips.push(a.episodes + ' ép.');
+            if (a.status) chips.push(STATUS_FR[a.status] || a.status);
+            (a.genres || []).slice(0, 3).forEach(g => chips.push(g.name));
+            const tr = a.trailer && a.trailer.images && (a.trailer.images.maximum_image_url || a.trailer.images.large_image_url);
+            return {
+                src: 'jikan', id: a.mal_id,
+                title: a.title_english || a.title,
+                original: a.title_japanese || (a.title_english ? a.title : ''),
+                img: jpg.large_image_url || jpg.image_url || '',
+                backdrop: tr || jpg.large_image_url || '',
+                synopsis: cleanSynopsis(a.synopsis),
+                score: a.score || 0,
+                year: a.year || (a.aired && a.aired.prop && a.aired.prop.from && a.aired.prop.from.year) || '',
+                chips: chips,
+                url: a.url
+            };
+        }
+        async function fetchJikanP(p) {
+            const q = new URLSearchParams({ page: p.page || 1, limit: p.limit || 24, sfw: 'true' });
+            let path;
+            const sort = p.sort || 'pop';
+            if (p.query || p.genre) {
+                path = '/anime';
+                if (p.query) q.set('q', p.query);
+                if (p.genre) q.set('genres', p.genre);
+                const ob = { pop: ['popularity', 'asc'], top: ['score', 'desc'], new: ['start_date', 'desc'] }[sort];
+                q.set('order_by', ob[0]); q.set('sort', ob[1]);
+            } else if (sort === 'pop') { path = '/top/anime'; q.set('filter', 'bypopularity'); }
+            else if (sort === 'top') { path = '/top/anime'; }
+            else { path = '/seasons/now'; }
+            const d = await getJSON(JIKAN + path + '?' + q.toString());
+            return {
+                items: (d.data || []).filter(a => a.images).map(jikanToItem),
+                hasNext: !!(d.pagination && d.pagination.has_next_page)
+            };
         }
 
-        function placeholder(title) {
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="45%" font-size="40" text-anchor="middle">🎬</text><text x="50%" y="62%" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="13" text-anchor="middle">${esc(title).slice(0, 24)}</text></svg>`;
-            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        // ============ INTERNET ARCHIVE (films complets du domaine public) ============
+        function iaToItem(d) {
+            const t = Array.isArray(d.title) ? d.title[0] : d.title;
+            const y = Array.isArray(d.year) ? d.year[0] : d.year;
+            return {
+                src: 'ia', id: d.identifier, title: String(t || d.identifier), original: '',
+                img: IA + '/services/img/' + encodeURIComponent(d.identifier),
+                synopsis: '', score: 0, year: y ? String(y).slice(0, 4) : '',
+                chips: ['Domaine public'].concat(y ? [String(y).slice(0, 4)] : []), fullFree: true
+            };
         }
-
-        function appendCards() {
-            const g = $('grid');
-            g.querySelectorAll('.skeleton').forEach(n => n.remove());
-            for (let i = state.rendered; i < state.items.length; i++) {
-                const item = state.items[i];
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => openDetail(item);
-                const fb = placeholder(item.title);
-                card.innerHTML = `
-                    <div class="card-img">
-                        ${item.trailerKey ? '<span class="badge play">▶ TRAILER</span>' : ''}
-                        ${item.score > 0 ? '<span class="badge score">★ ' + item.score.toFixed(1) + '</span>' : ''}
-                        <img src="${esc(item.img)}" alt="${esc(item.title)}" loading="lazy" onerror="this.onerror=null; this.src='${fb}';">
-                    </div>
-                    <div class="card-info">
-                        <div class="card-title">${esc(item.title)}</div>
-                        <div class="card-sub">${esc([item.year, item.chips[0]].filter(Boolean).join(' • '))}</div>
-                    </div>`;
-                g.appendChild(card);
-            }
-            state.rendered = state.items.length;
+        async function fetchIAP(p) {
+            const rows = p.rows || 24, page = p.page || 1;
+            let q = 'mediatype:movies AND collection:(feature_films OR classic_tv OR animationandcartoons)';
+            const words = (p.query || '').replace(/[^\p{L}\p{N}\s]/gu, ' ').trim().split(/\s+/).filter(Boolean);
+            if (words.length) q += ' AND title:(' + words.join(' AND ') + ')';
+            if (p.genre) q += ' AND ' + p.genre;
+            const sort = { pop: 'downloads desc', top: 'avg_rating desc', 'new': 'addeddate desc' }[p.sort || 'pop'];
+            const u = new URL(IA + '/advancedsearch.php');
+            u.searchParams.set('q', q);
+            ['identifier', 'title', 'year'].forEach(f => u.searchParams.append('fl[]', f));
+            u.searchParams.set('rows', rows); u.searchParams.set('page', page);
+            u.searchParams.set('output', 'json'); u.searchParams.append('sort[]', sort);
+            const d = await getJSON(u.toString());
+            const r = d.response || {};
+            return { items: (r.docs || []).map(iaToItem), hasNext: page * rows < (r.numFound || 0) };
         }
-
-        function updateFooter(msg) {
-            const st = $('status');
-            const more = $('more');
-            st.style.display = msg ? 'block' : 'none';
-            st.textContent = msg || '';
-            more.style.display = (state.hasNext && state.items.length) ? 'block' : 'none';
-            more.textContent = state.loading ? 'Chargement…' : 'Charger plus';
+        function iaPickFiles(files) {
+            const exts = ['mp4', 'webm', 'ogv'];
+            for (const ext of exts) {
+                const re = new RegExp('\\.' + ext + '$', 'i');
+                const all = (files || []).filter(f => re.test(f.name) && !/trailer|sample/i.test(f.name));
+                if (!all.length) continue;
+                const orig = all.filter(f => f.source === 'original');
+                if (orig.length > 1) return orig.slice(0, 40);
+                const sorted = all.slice().sort((a, b) => (+a.size || 0) - (+b.size || 0));
+                const ok = sorted.filter(f => (+f.size || 0) <= 1.2e9);
+                return [ok.length ? ok[ok.length - 1] : sorted[0]];
+            }
+            return [];
         }
+        const iaUrl = (id, name) => IA + '/download/' + encodeURIComponent(id) + '/' + name.split('/').map(encodeURIComponent).join('/');
 
-        async function load(reset) {
-            if (!reset && state.loading) return;
-            const token = ++state.token;
-            if (reset) {
-                state.page = 1; state.items = []; state.seen = new Set(); state.rendered = 0; state.hasNext = false;
-                renderSkeleton();
-            }
-            state.loading = true;
-            updateFooter('');
-            try {
-                const fetcher = TABS[state.tab].src === 'jikan' ? fetchJikan : fetchTmdb;
-                let added = 0, tries = 0;
-                do {
-                    const res = await fetcher();
-                    if (token !== state.token) return;
-                    res.items.forEach(it => {
-                        const k = it.src + it.id;
-                        if (!state.seen.has(k)) { state.seen.add(k); state.items.push(it); added++; }
-                    });
-                    state.hasNext = res.hasNext;
-                    if (res.hasNext) state.page++;
-                    tries++;
-                } while (added === 0 && state.hasNext && tries < 4);
-                appendCards();
-                if (!state.items.length) updateFooter('Aucun résultat.');
-            } catch (e) {
-                if (token !== state.token) return;
-                $('grid').querySelectorAll('.skeleton').forEach(n => n.remove());
-                if (e.code === 401) { showKeySetup('Clé refusée par TMDB. Vérifie-la et réessaie.'); }
-                else updateFooter('Impossible de charger (connexion ou limite de l\'API). Réessaie dans quelques secondes.');
-            } finally {
-                if (token === state.token) { state.loading = false; updateFooter($('status').textContent); }
-            }
-        }
+        // ============ ÉTAT / NAVIGATION ============
+        const state = { tab: 'home', sort: 'pop', genre: '', query: '', page: 1, hasNext: false, items: [], seen: new Set(), rendered: 0, loading: false, token: 0 };
+        const animeCfg = () => (getKey() && settings.animeSrc !== 'jikan') ? { src: 'tmdb', media: 'tv', lang: 'ja', genre: '16', label: 'Anime' } : { src: 'jikan' };
+        const cfg = () => state.tab === 'anime' ? animeCfg() : TABS[state.tab];
+        const fetchFor = (c, p) => c.src === 'jikan' ? fetchJikanP(p) : c.src === 'ia' ? fetchIAP(p) : fetchTmdbP(c, p);
+        const genreKey = c => c.src === 'jikan' ? 'jikan' : c.src === 'ia' ? 'ia' : (c.media === 'movie' ? 'movie' : 'tv');
 
-        // ============ NAVIGATION ============
-        function needsKey() { return TABS[state.tab].src === 'tmdb' && !getKey(); }
-
-        function startLoad() {
-            if (needsKey()) {
-                $('grid').innerHTML = '';
-                state.items = []; state.hasNext = false;
-                updateFooter('Clé TMDB requise pour cet onglet.');
-                showKeySetup();
-                return;
+        function buildControls() {
+            const box = $('sorts');
+            box.innerHTML = '';
+            const t = state.tab;
+            if (t === 'home') { box.style.display = 'none'; return; }
+            box.style.display = 'flex';
+            (t === 'list' ? LIST_SORTS : SORTS).forEach(s => {
+                box.append(h('button', { class: 'chip-sort' + (state.sort === s[0] ? ' active' : ''), 'data-sort': s[0], type: 'button', text: s[1] }));
+            });
+            if (t !== 'list') {
+                const sel = h('select', { class: 'glass', id: 'genre', 'aria-label': 'Genre' });
+                GENRES[genreKey(cfg())].forEach(g => sel.append(h('option', { value: g[0], text: g[1] })));
+                sel.value = state.genre;
+                sel.onchange = () => { state.genre = sel.value; startLoad(); };
+                box.append(sel);
             }
-            load(true);
         }
 
         $('tabs').addEventListener('click', e => {
             const b = e.target.closest('.tab');
-            if (!b || b.dataset.tab === state.tab) return;
-            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === b));
-            state.tab = b.dataset.tab;
-            startLoad();
+            if (!b) return;
+            goTab(b.dataset.tab);
         });
-
+        function goTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+            const el = document.querySelector('.tab[data-tab="' + tab + '"]');
+            if (el && el.scrollIntoView) el.scrollIntoView({ inline: 'center', block: 'nearest' });
+            state.tab = tab; state.sort = tab === 'list' ? 'fav' : 'pop'; state.genre = '';
+            buildControls();
+            startLoad();
+            window.scrollTo(0, 0);
+        }
         $('sorts').addEventListener('click', e => {
             const b = e.target.closest('.chip-sort');
             if (!b || b.dataset.sort === state.sort) return;
@@ -480,148 +628,227 @@
                 const q = e.target.value.trim();
                 if (q === state.query) return;
                 state.query = q;
+                buildControls();
                 startLoad();
             }, 450);
         });
-
-        $('more').addEventListener('click', () => load(false));
-
-        // ============ CLÉ TMDB ============
-        function showKeySetup(msg) {
-            const err = $('key-error');
-            err.style.display = msg ? 'block' : 'none';
-            err.textContent = msg || '';
-            $('key-setup').style.display = 'flex';
-        }
-        function cancelKey() { $('key-setup').style.display = 'none'; }
-        function saveKey() {
-            const v = $('key-input').value.trim();
-            if (!v) { showKeySetup('Colle ta clé pour continuer.'); return; }
-            try { localStorage.setItem('tmdb_key', v); } catch (e) {}
-            $('key-setup').style.display = 'none';
-            startLoad();
+        $('searchInput').addEventListener('change', e => {
+            const q = e.target.value.trim();
+            if (q.length < 3) return;
+            recent = [q].concat(recent.filter(r => r !== q)).slice(0, 8);
+            LS.set('jm_recent', recent);
+            fillRecents();
+        });
+        function fillRecents() {
+            const dl = $('recents'); dl.innerHTML = '';
+            recent.forEach(r => dl.append(h('option', { value: r })));
         }
 
-        // ============ FICHE : BANDE-ANNONCE + RÉSUMÉ ============
-        let detailToken = 0;
-
-        function setTrailer(key) {
-            const wrap = $('trailer-wrap');
-            if (key) {
-                wrap.innerHTML = '<iframe title="Bande-annonce" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(key) + '?rel=0&playsinline=1&hl=fr&cc_lang_pref=fr&cc_load_policy=1"></iframe>';
-            } else {
-                wrap.innerHTML = '<div class="no-trailer">Aucune bande-annonce disponible pour ce titre.</div>';
-            }
+        function showMode(mode) {
+            $('home').style.display = mode === 'home' ? 'block' : 'none';
+            $('grid').style.display = mode === 'grid' ? 'grid' : 'none';
         }
-
-        function setActions(item, trailerKey, providers) {
-            const box = $('d-actions');
-            box.innerHTML = '';
-            if (item.src === 'jikan' && item.synopsis) {
-                const t = document.createElement('button');
-                t.className = 'btn red';
-                t.textContent = item.fr ? '🌐 Voir l\'original (anglais)' : '🌐 Traduire en français';
-                t.onclick = () => toggleTranslate(item, t);
-                box.appendChild(t);
-            }
-            if (trailerKey) {
-                const a = document.createElement('a');
-                a.className = 'btn'; a.target = '_blank'; a.rel = 'noopener noreferrer';
-                a.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(trailerKey);
-                a.textContent = '▶ Ouvrir sur YouTube';
-                box.appendChild(a);
-            }
-            if (item.src === 'jikan' && item.url) {
-                const a = document.createElement('a');
-                a.className = 'btn'; a.target = '_blank'; a.rel = 'noopener noreferrer';
-                a.href = item.url; a.textContent = '📄 Fiche MyAnimeList';
-                box.appendChild(a);
-            }
-            if (providers && providers.link) {
-                const a = document.createElement('a');
-                a.className = 'btn red'; a.target = '_blank'; a.rel = 'noopener noreferrer';
-                a.href = providers.link;
-                a.textContent = '📺 Où regarder légalement' + (providers.names.length ? ' (' + providers.names.slice(0, 3).join(', ') + ')' : '');
-                box.appendChild(a);
-            }
+        function prepareGrid() {
+            state.items = []; state.seen = new Set(); state.rendered = 0; state.hasNext = false;
+            $('grid').innerHTML = '';
+            showMode('grid');
+            updateFooter('');
         }
-
-        async function getTmdbExtras(item) {
-            const [vids, prov, det] = await Promise.all([
-                tmdb('/' + item.media + '/' + item.id + '/videos', { include_video_language: 'fr,en,ko,null' }).catch(() => null),
-                tmdb('/' + item.media + '/' + item.id + '/watch/providers', {}).catch(() => null),
-                item.synopsis ? Promise.resolve(null) : tmdb('/' + item.media + '/' + item.id, { language: 'en-US' }).catch(() => null)
-            ]);
-            let trailer = '';
-            if (vids) {
-                const list = (vids.results || []).filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser'));
-                list.sort((a, b) => ((b.iso_639_1 === 'fr') - (a.iso_639_1 === 'fr')) || ((b.type === 'Trailer') - (a.type === 'Trailer')));
-                if (list[0]) trailer = list[0].key;
-            }
-            let providers = null;
-            if (prov && prov.results) {
-                const res = prov.results;
-                const region = res.FR ? 'FR' : (res.CD ? 'CD' : Object.keys(res)[0]);
-                if (region) {
-                    const r = res[region];
-                    let list = [].concat(r.flatrate || [], r.free || [], r.ads || []);
-                    if (!list.length) list = [].concat(r.rent || [], r.buy || []);
-                    const names = [];
-                    list.forEach(p => { if (names.indexOf(p.provider_name) === -1) names.push(p.provider_name); });
-                    providers = { link: r.link, names: names };
-                }
-            }
-            return { trailer: trailer, providers: providers, fallbackSynopsis: det && det.overview ? det.overview : '' };
-        }
-
-        function showSynopsis(item) {
-            const txt = item.fr && item.showFr ? item.fr : item.synopsis;
-            $('d-syn').textContent = txt || 'Résumé indisponible pour ce titre.';
-            $('d-note').textContent = item.fr && item.showFr ? 'Traduction automatique (MyMemory) — peut contenir des erreurs.' :
-                (item.src === 'jikan' && item.synopsis ? 'Résumé en anglais (source MyAnimeList).' : (item.synopsisLang === 'en' ? 'Résumé non disponible en français : version anglaise.' : ''));
-        }
-
-        async function openDetail(item) {
-            const token = ++detailToken;
-            $('detail').style.display = 'flex';
-            $('d-head-title').textContent = item.title;
-            $('d-title').textContent = item.title;
-            $('d-orig').textContent = item.original && item.original !== item.title ? item.original : '';
-            const chips = $('d-chips');
-            chips.innerHTML = '';
-            const all = item.chips.slice();
-            if (item.score > 0) all.unshift('★ ' + item.score.toFixed(1));
-            all.forEach(c => { const s = document.createElement('span'); s.className = 'chip'; s.textContent = c; chips.appendChild(s); });
-            item.showFr = !!item.fr;
-            showSynopsis(item);
-            document.querySelector('.d-body').scrollTop = 0;
-
-            if (item.src === 'jikan') {
-                setTrailer(item.trailerKey);
-                setActions(item, item.trailerKey, null);
+        function startLoad() {
+            state.token++;
+            const t = state.tab;
+            if (t === 'home' && !state.query) { showMode('home'); updateFooter(''); return loadHome(); }
+            if (t === 'home') return searchAll();
+            if (t === 'list') return renderList();
+            const c = cfg();
+            if (c.src === 'tmdb' && !getKey()) {
+                prepareGrid();
+                updateFooter('Clé TMDB requise pour cet onglet.');
+                openSettings('Une clé TMDB gratuite est nécessaire pour cet onglet.');
                 return;
             }
-            $('trailer-wrap').innerHTML = '<div class="no-trailer">Chargement de la bande-annonce…</div>';
-            setActions(item, '', null);
-            const ex = await getTmdbExtras(item);
-            if (token !== detailToken) return;
-            if (!item.synopsis && ex.fallbackSynopsis) { item.synopsis = ex.fallbackSynopsis; item.synopsisLang = 'en'; showSynopsis(item); }
-            item.trailerKey = ex.trailer;
-            setTrailer(ex.trailer);
-            setActions(item, ex.trailer, ex.providers);
+            load(true);
         }
 
-        function closeDetail() {
-            detailToken++;
-            $('trailer-wrap').innerHTML = '';
-            $('detail').style.display = 'none';
+        // ============ GRILLE ============
+        function renderSkeleton() {
+            const g = $('grid');
+            g.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                g.append(h('div', { class: 'card skeleton' }, h('div', { class: 'card-img' }), h('div', { class: 'card-info' }, h('div', { class: 'sk-line' }), h('div', { class: 'sk-line short' }))));
+            }
+        }
+        function cardEl(item, strip) {
+            const fb = placeholder(item.title);
+            const img = h('img', { src: item.img || fb, alt: item.title, loading: 'lazy' });
+            img.onerror = () => { img.onerror = null; img.src = fb; };
+            const prog = hist.find(x => x.key === ik(item));
+            const pct = prog && resumable(prog) ? Math.min(100, 100 * prog.pos / prog.dur) : 0;
+            const c = h('div', { class: 'card', tabindex: '0', role: 'button', 'aria-label': item.title },
+                h('div', { class: 'card-img' },
+                    item.fullFree ? h('span', { class: 'badge play', text: '▶ COMPLET' }) : null,
+                    item.score > 0 ? h('span', { class: 'badge score', text: '★ ' + item.score.toFixed(1) }) : null,
+                    img,
+                    pct ? h('div', { class: 'prog' }, h('i', { style: 'width:' + pct + '%' })) : null),
+                h('div', { class: 'card-info' },
+                    h('div', { class: 'card-title', text: item.title }),
+                    h('div', { class: 'card-sub', text: [item.year, item.chips && item.chips[0]].filter(Boolean).join(' • ') })));
+            c.onclick = () => openDetail(item);
+            c.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(item); } };
+            return c;
+        }
+        function appendCards() {
+            const g = $('grid');
+            g.querySelectorAll('.skeleton').forEach(n => n.remove());
+            for (let i = state.rendered; i < state.items.length; i++) g.append(cardEl(state.items[i]));
+            state.rendered = state.items.length;
+        }
+        function updateFooter(msg) {
+            const st = $('status'), more = $('more');
+            st.style.display = msg ? 'block' : 'none';
+            st.textContent = msg || '';
+            more.style.display = (state.hasNext && state.items.length && $('grid').style.display !== 'none') ? 'block' : 'none';
+            more.textContent = state.loading ? 'Chargement…' : 'Charger plus';
+        }
+        async function load(reset) {
+            if (!reset && state.loading) return;
+            const token = ++state.token;
+            if (reset) { prepareGrid(); state.page = 1; renderSkeleton(); }
+            state.loading = true;
+            updateFooter('');
+            try {
+                const c = cfg();
+                let added = 0, tries = 0;
+                do {
+                    const res = await fetchFor(c, { page: state.page, sort: state.sort, genre: state.genre, query: state.query });
+                    if (token !== state.token) return;
+                    res.items.forEach(it => {
+                        const k = ik(it);
+                        if (!state.seen.has(k)) { state.seen.add(k); state.items.push(it); added++; }
+                    });
+                    state.hasNext = res.hasNext;
+                    if (res.hasNext) state.page++;
+                    tries++;
+                } while (added === 0 && state.hasNext && tries < 4);
+                appendCards();
+                if (!state.items.length) updateFooter('Aucun résultat.');
+            } catch (e) {
+                if (token !== state.token) return;
+                $('grid').querySelectorAll('.skeleton').forEach(n => n.remove());
+                if (e.code === 401) openSettings('Clé refusée par TMDB. Vérifie-la et réessaie.');
+                else updateFooter('Impossible de charger (connexion ou limite de l\'API). Réessaie dans quelques secondes.');
+            } finally {
+                if (token === state.token) { state.loading = false; updateFooter($('status').textContent); }
+            }
+        }
+        $('more').addEventListener('click', () => load(false));
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver(es => {
+                if (es[0].isIntersecting && state.hasNext && !state.loading && $('grid').style.display !== 'none') load(false);
+            }, { rootMargin: '300px' }).observe($('more'));
         }
 
-        // ============ TRADUCTION (MyMemory, gratuit sans clé) ============
+        function renderList() {
+            prepareGrid();
+            let arr = state.sort === 'hist' ? hist.map(x => x.item) : state.sort === 'cont' ? hist.filter(resumable).map(x => x.item) : favs;
+            const q = state.query.toLowerCase();
+            if (q) arr = arr.filter(i => i.title.toLowerCase().indexOf(q) > -1);
+            state.items = arr;
+            appendCards();
+            if (!arr.length) updateFooter(state.sort === 'fav' ? 'Ta liste est vide. Appuie sur « Ajouter à ma liste » dans une fiche.' : 'Rien ici pour le moment.');
+        }
+
+        async function searchAll() {
+            const token = ++state.token, q = state.query;
+            prepareGrid(); renderSkeleton();
+            const jobs = [
+                (async () => { const c = animeCfg(); if (c.src === 'tmdb' && !getKey()) return []; return (await fetchFor(c, { query: q, page: 1 })).items.slice(0, 12); })(),
+                (async () => {
+                    if (!getKey()) return [];
+                    const d = await tmdb('/search/multi', { query: q, include_adult: 'false' });
+                    const gm = await getGenres('movie').catch(() => ({})), gt = await getGenres('tv').catch(() => ({}));
+                    return (d.results || []).filter(r => r.poster_path && (r.media_type === 'movie' || r.media_type === 'tv'))
+                        .map(r => tmdbToItem(r, r.media_type, r.media_type === 'movie' ? 'Film' : 'Série', r.media_type === 'movie' ? gm : gt)).slice(0, 18);
+                })(),
+                (async () => (await fetchIAP({ query: q, page: 1, rows: 12 })).items)()
+            ];
+            const res = await Promise.allSettled(jobs);
+            if (token !== state.token) return;
+            state.items = []; state.seen = new Set(); state.rendered = 0;
+            res.forEach(r => { if (r.status === 'fulfilled') r.value.forEach(it => { const k = ik(it); if (!state.seen.has(k)) { state.seen.add(k); state.items.push(it); } }); });
+            appendCards();
+            if (!state.items.length) updateFooter(getKey() ? 'Aucun résultat.' : 'Aucun résultat. Ajoute une clé TMDB dans ⚙ pour chercher aussi les films et séries.');
+        }
+
+        // ============ ACCUEIL ============
+        function addRow(box, title, items, tab) {
+            if (!items.length) return;
+            const strip = h('div', { class: 'strip' });
+            items.forEach(i => strip.append(cardEl(i, true)));
+            box.append(h('section', { class: 'row' },
+                h('div', { class: 'row-h' }, h('h3', { text: title }), tab ? h('button', { class: 'more-link', type: 'button', text: 'Voir tout ›', onclick: () => goTab(tab) }) : null),
+                strip));
+        }
+        function addHero(box, it) {
+            const bg = it.backdrop || it.img;
+            const hero = h('div', { class: 'hero', role: 'button', tabindex: '0', 'aria-label': 'Ouvrir ' + it.title },
+                h('div', { class: 'hero-in' },
+                    h('h2', { text: it.title }),
+                    h('p', { text: it.synopsis || (it.chips || []).join(' • ') }),
+                    h('div', { class: 'actions', style: 'margin-top:0' },
+                        h('button', { class: 'btn red', type: 'button', text: 'Voir la fiche' }))));
+            if (bg) hero.style.backgroundImage = 'url("' + bg + '")';
+            hero.onclick = () => openDetail(it);
+            hero.onkeydown = e => { if (e.key === 'Enter') openDetail(it); };
+            box.append(hero);
+        }
+        async function loadHome() {
+            const token = state.token;
+            const box = $('home');
+            box.innerHTML = '';
+            const hasKey = !!getKey();
+            let heroDone = false;
+            const cont = hist.filter(resumable).map(x => x.item);
+            if (cont.length) addRow(box, '▶ Continuer à regarder', cont, null);
+            if (!hasKey) {
+                box.append(h('div', { class: 'panel keybanner' }, 'Ajoute ta clé TMDB gratuite pour débloquer films, dramas, animés en français et épisodes. ',
+                    h('button', { class: 'btn red', type: 'button', text: '🔑 Ajouter ma clé', onclick: () => openSettings() })));
+            }
+            const ac = animeCfg();
+            const plan = [
+                ['🎌 Animés populaires', 'anime', () => fetchFor(ac, { page: 1, sort: 'pop', limit: 14 })],
+                ['🎬 Films coréens populaires', 'movie', hasKey ? () => fetchTmdbP(TABS.movie, { page: 1, sort: 'pop' }) : null],
+                ['🇰🇷 Dramas coréens populaires', 'drama', hasKey ? () => fetchTmdbP(TABS.drama, { page: 1, sort: 'pop' }) : null],
+                ['🎞️ Films d\'animation japonais', 'animefilm', hasKey ? () => fetchTmdbP(TABS.animefilm, { page: 1, sort: 'pop' }) : null],
+                ['🩸 Horreur : films complets libres', 'free', () => fetchIAP({ page: 1, genre: GENRES.ia[2][0], rows: 14 })],
+                ['🍿 Films complets en français', 'free', () => fetchIAP({ page: 1, genre: GENRES.ia[1][0], rows: 14 })]
+            ];
+            for (const row of plan) {
+                if (!row[2]) continue;
+                try {
+                    const res = await row[2]();
+                    if (token !== state.token) return;
+                    const items = res.items.slice(0, 14);
+                    if (!heroDone && items.length) {
+                        const hi = items.find(i => i.backdrop) || items[0];
+                        const hero = $('home').querySelector('.hero');
+                        if (!hero) { const tmp = h('div'); addHero(tmp, hi); box.insertBefore(tmp.firstChild, box.firstChild); }
+                        heroDone = true;
+                    }
+                    addRow(box, row[0], items, row[1]);
+                } catch (e) {
+                    if (token !== state.token) return;
+                    if (e.code === 401) { openSettings('Clé refusée par TMDB. Vérifie-la et réessaie.'); return; }
+                }
+                if (row[2] && ac.src === 'jikan' && row[1] === 'anime') await sleep(400);
+            }
+            if (token === state.token && !box.querySelector('.row')) box.append(h('div', { id: 'home-empty', style: 'padding:30px 16px;text-align:center;color:rgba(255,255,255,0.6);font-size:13px', text: 'Impossible de charger l\'accueil (connexion ou limite de l\'API).' }));
+        }
+
+        // ============ RÉSUMÉ / TRADUCTION ============
         function chunkText(text, max) {
             const sentences = text.match(/[^.!?]+[.!?]*\s*/g) || [text];
-            const res = [];
-            let cur = '';
+            const res = []; let cur = '';
             sentences.forEach(s => {
                 if (s.length > max) {
                     if (cur.trim()) res.push(cur.trim());
@@ -635,7 +862,6 @@
             if (cur.trim()) res.push(cur.trim());
             return res;
         }
-
         async function translateFR(text) {
             const out = [];
             for (const part of chunkText(text, 400)) {
@@ -647,29 +873,457 @@
             return out.join(' ');
         }
 
-        async function toggleTranslate(item, btn) {
-            if (item.fr) {
-                item.showFr = !item.showFr;
-                showSynopsis(item);
-                btn.textContent = item.showFr ? '🌐 Voir l\'original (anglais)' : '🌐 Voir la traduction';
-                return;
+        // ============ FICHE DÉTAIL ============
+        let detailToken = 0;
+        const overlayOpen = id => $(id).style.display === 'flex' || $(id).classList.contains('open');
+
+        function openOverlayState(name) { try { history.pushState({ o: name }, ''); } catch (e) {} }
+
+        function trailerNode(key, bg) {
+            const w = h('div', { class: 'trailer-wrap' });
+            if (key) {
+                w.append(h('iframe', { title: 'Bande-annonce', allow: 'encrypted-media; picture-in-picture; fullscreen', allowfullscreen: true, referrerpolicy: 'strict-origin-when-cross-origin',
+                    src: 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(key) + '?rel=0&playsinline=1&hl=fr&cc_lang_pref=fr&cc_load_policy=1' }));
+            } else {
+                if (bg) w.style.backgroundImage = 'url("' + bg + '")';
+                w.append(h('div', { class: 'no-trailer', text: 'Aucune bande-annonce disponible.' }));
             }
-            btn.setAttribute('disabled', '');
-            btn.textContent = 'Traduction…';
-            try {
-                item.fr = await translateFR(item.synopsis);
-                item.showFr = true;
-                showSynopsis(item);
-                btn.textContent = '🌐 Voir l\'original (anglais)';
-            } catch (e) {
-                btn.textContent = '🌐 Traduire en français';
-                $('d-note').textContent = 'Traduction indisponible pour le moment (limite gratuite atteinte). Réessaie plus tard.';
-            }
-            btn.removeAttribute('disabled');
+            return w;
         }
 
+        function shareItem(item) {
+            const url = item.src === 'tmdb' ? 'https://www.themoviedb.org/' + item.media + '/' + item.id
+                : item.src === 'jikan' ? (item.url || 'https://myanimelist.net/anime/' + item.id) : IA + '/details/' + item.id;
+            (async () => {
+                try {
+                    if (navigator.share) await navigator.share({ title: item.title, url: url });
+                    else { await navigator.clipboard.writeText(url); toast('Lien copié'); }
+                } catch (e) {}
+            })();
+        }
+
+        function epRow(item, key, num, title, overview, img, meta, onChange) {
+            const k = ik(item);
+            const isSeen = () => (seen[k] || []).indexOf(key) > -1;
+            const btn = h('button', { class: 'ep-seen', type: 'button', 'aria-label': 'Marquer comme vu', text: '✓' });
+            const row = h('div', { class: 'ep' + (isSeen() ? ' done' : '') },
+                img ? h('img', { src: img, alt: '', loading: 'lazy' }) : h('div', { class: 'ep-num', text: String(num) }),
+                h('div', { class: 'ep-txt' },
+                    h('div', { class: 'ep-t', text: (img ? num + '. ' : '') + title }),
+                    meta ? h('div', { class: 'ep-m', text: meta }) : null,
+                    overview ? h('div', { class: 'ep-o', text: overview }) : null),
+                btn);
+            btn.onclick = () => {
+                const arr = seen[k] || [];
+                const i = arr.indexOf(key);
+                if (i > -1) arr.splice(i, 1); else arr.push(key);
+                seen[k] = arr; LS.set('jm_seen', seen);
+                row.classList.toggle('done', isSeen());
+                if (onChange) onChange();
+            };
+            return row;
+        }
+        const seenCount = (item, prefix) => (seen[ik(item)] || []).filter(x => !prefix || x.indexOf(prefix) === 0).length;
+
+        function episodesTmdb(item, seasons, panel) {
+            const sel = h('select', { class: 'glass', 'aria-label': 'Saison' });
+            seasons.forEach(s => sel.append(h('option', { value: s.season_number, text: s.name || ('Saison ' + s.season_number) })));
+            const count = h('span', { class: 'eps-count' });
+            const list = h('div');
+            const upd = () => { count.textContent = seenCount(item, 'S' + sel.value + 'E') + ' vu(s)'; };
+            panel.append(h('div', { class: 'eps-head' }, sel, count), list);
+            const loadSeason = async () => {
+                list.textContent = 'Chargement…';
+                try {
+                    const s = await tmdb('/tv/' + item.id + '/season/' + sel.value);
+                    list.innerHTML = '';
+                    (s.episodes || []).forEach(e => list.append(epRow(item, 'S' + sel.value + 'E' + e.episode_number, e.episode_number, e.name || ('Épisode ' + e.episode_number), e.overview,
+                        e.still_path ? IMG + 'w300' + e.still_path : '', [e.air_date, e.runtime ? e.runtime + ' min' : ''].filter(Boolean).join(' • '), upd)));
+                    if (!(s.episodes || []).length) list.textContent = 'Aucun épisode référencé.';
+                    upd();
+                } catch (err) { list.textContent = 'Épisodes indisponibles.'; }
+            };
+            sel.onchange = loadSeason;
+            if (seasons.length) loadSeason(); else list.textContent = 'Aucune saison référencée.';
+        }
+
+        function episodesJikan(item, panel, token) {
+            const list = h('div');
+            const count = h('span', { class: 'eps-count' });
+            const more = h('button', { class: 'btn', type: 'button', text: 'Charger plus d\'épisodes', style: 'display:none;margin-top:10px' });
+            panel.append(h('div', { class: 'eps-head' }, h('span', { class: 'eps-count', text: 'Titres des épisodes (MyAnimeList)' }), count), list, more);
+            let page = 1;
+            const upd = () => { count.textContent = seenCount(item) + ' vu(s)'; };
+            const loadPage = async () => {
+                more.disabled = true;
+                try {
+                    const d = await getJSON(JIKAN + '/anime/' + item.id + '/episodes?page=' + page);
+                    if (token !== detailToken) return;
+                    (d.data || []).forEach(e => list.append(epRow(item, 'E' + e.mal_id, e.mal_id, e.title || ('Épisode ' + e.mal_id),
+                        '', '', [e.aired ? e.aired.slice(0, 10) : '', e.filler ? 'Filler' : '', e.recap ? 'Récap' : ''].filter(Boolean).join(' • '), upd)));
+                    if (d.pagination && d.pagination.has_next_page) { page++; more.style.display = 'inline-block'; } else more.style.display = 'none';
+                    if (!list.children.length) list.textContent = 'Aucun épisode référencé (film ou série à venir).';
+                    upd();
+                } catch (e) { if (!list.children.length) list.textContent = 'Épisodes indisponibles pour le moment.'; }
+                more.disabled = false;
+            };
+            more.onclick = loadPage;
+            loadPage();
+        }
+
+        function providersNode(res, region) {
+            const box = h('div');
+            const regions = Object.keys(res || {});
+            if (!regions.length) { box.append(h('div', { class: 'note', text: 'Aucune offre légale référencée pour ce titre.' })); return box; }
+            const use = res[region] ? region : (res.FR ? 'FR' : regions[0]);
+            const r = res[use];
+            const chips = h('div', { class: 'chips', style: 'margin-top:0' });
+            PROV_TYPES.forEach(t => (r[t[0]] || []).forEach(p => chips.append(h('a', { class: 'chip', href: r.link, target: '_blank', rel: 'noopener noreferrer', text: p.provider_name + ' · ' + t[1] }))));
+            const label = (REGIONS.find(x => x[0] === use) || [use, use])[1];
+            box.append(h('div', { class: 'note', style: 'margin:0 0 8px', text: use === region ? 'Offres légales en ' + label + ' :' : 'Aucune offre pour ton pays (' + region + '). Offres en ' + label + ' :' }));
+            if (chips.children.length) box.append(chips);
+            else box.append(h('div', { class: 'note', text: 'Seulement location/achat ou lien général :' }));
+            if (r.link) box.append(h('div', { class: 'actions' }, h('a', { class: 'btn', href: r.link, target: '_blank', rel: 'noopener noreferrer', text: '📺 Voir toutes les offres' })));
+            return box;
+        }
+
+        function iaLookup(item) {
+            const box = h('div', { class: 'btn-col' });
+            const out = h('div', { class: 'btn-col' });
+            const btn = h('button', { class: 'btn', type: 'button', text: '🔍 Chercher une version complète libre de droits' });
+            btn.onclick = async () => {
+                btn.disabled = true; out.innerHTML = ''; out.append(h('div', { class: 'note', text: 'Recherche sur l\'Internet Archive…' }));
+                try {
+                    let items = [];
+                    for (const n of [item.title, item.original].filter(Boolean)) {
+                        items = (await fetchIAP({ query: n, page: 1, rows: 6 })).items;
+                        if (items.length) break;
+                    }
+                    out.innerHTML = '';
+                    if (!items.length) out.append(h('div', { class: 'note', text: 'Aucune version libre trouvée (normal pour les titres récents : ils ne sont pas dans le domaine public).' }));
+                    items.forEach(it => out.append(h('button', { class: 'btn red', type: 'button', text: '▶ ' + it.title + (it.year ? ' (' + it.year + ')' : ''), onclick: () => openDetail(it) })));
+                } catch (e) { out.innerHTML = ''; out.append(h('div', { class: 'note', text: 'Recherche impossible pour le moment.' })); }
+                btn.disabled = false;
+            };
+            box.append(btn, out);
+            return box;
+        }
+
+        async function openDetail(item) {
+            const token = ++detailToken;
+            const wasOpen = overlayOpen('detail');
+            $('detail').style.display = 'flex';
+            if (!wasOpen) openOverlayState('detail');
+            document.body.style.overflow = 'hidden';
+            $('d-head-title').textContent = item.title;
+            const body = $('d-body');
+            body.innerHTML = ''; body.scrollTop = 0;
+            pushHist(item);
+
+            const ctx = { key: ik(item), text: item.synopsis || '', lang: item.src === 'jikan' ? 'en' : 'fr', fr: '', showFr: false };
+            let mediaEl = h('div', { class: 'trailer-wrap' }, h('div', { class: 'no-trailer', text: 'Chargement…' }));
+            const chipsEl = h('div', { class: 'chips' });
+            const actions = h('div', { class: 'actions' });
+            const synEl = h('div', { class: 'syn' });
+            const note = h('div', { class: 'note' });
+            const trBox = h('div', { class: 'actions' });
+            const watchBox = h('div');
+            const epsPanel = h('div', { class: 'panel', style: 'display:none' }, h('div', { class: 'syn-title', text: 'ÉPISODES' }));
+            const castPanel = h('div', { class: 'panel', style: 'display:none' }, h('div', { class: 'syn-title', text: 'CASTING' }));
+            const recPanel = h('div', { class: 'panel', style: 'display:none' }, h('div', { class: 'syn-title', text: 'À VOIR AUSSI' }));
+
+            const favBtn = h('button', { class: 'btn red', type: 'button' });
+            const setFavText = () => { favBtn.textContent = isFav(item) ? '❤ Dans ma liste' : '🤍 Ajouter à ma liste'; };
+            favBtn.onclick = () => { toggleFav(item); setFavText(); };
+            setFavText();
+            actions.append(favBtn, h('button', { class: 'btn', type: 'button', text: '↗ Partager', onclick: () => shareItem(item) }));
+
+            const setChips = arr => { chipsEl.innerHTML = ''; arr.filter(Boolean).forEach(c => chipsEl.append(h('span', { class: 'chip', text: c }))); };
+            const baseChips = (item.score > 0 ? ['★ ' + item.score.toFixed(1)] : []).concat(item.chips || []);
+            setChips(baseChips);
+
+            const renderSyn = () => {
+                const txt = ctx.showFr && ctx.fr ? ctx.fr : ctx.text;
+                synEl.textContent = txt || 'Résumé indisponible pour ce titre.';
+                note.textContent = ctx.showFr && ctx.fr ? 'Traduction automatique (MyMemory) — peut contenir des erreurs.'
+                    : (ctx.text && ctx.lang === 'en' ? 'Résumé en anglais.' : '');
+            };
+            const setupTr = () => {
+                trBox.innerHTML = '';
+                if (ctx.lang !== 'en' || !ctx.text) return;
+                const b = h('button', { class: 'btn red', type: 'button', text: '🌐 Traduire en français' });
+                if (trCache[ctx.key]) { ctx.fr = trCache[ctx.key]; ctx.showFr = true; b.textContent = '🌐 Voir l\'original'; }
+                b.onclick = async () => {
+                    if (ctx.fr) { ctx.showFr = !ctx.showFr; renderSyn(); b.textContent = ctx.showFr ? '🌐 Voir l\'original' : '🌐 Voir la traduction'; return; }
+                    b.disabled = true; b.textContent = 'Traduction…';
+                    try {
+                        ctx.fr = await translateFR(ctx.text); ctx.showFr = true;
+                        trCache[ctx.key] = ctx.fr;
+                        const ks = Object.keys(trCache); if (ks.length > 80) delete trCache[ks[0]];
+                        LS.set('jm_tr', trCache);
+                        renderSyn(); b.textContent = '🌐 Voir l\'original';
+                    } catch (e) { b.textContent = '🌐 Traduire en français'; note.textContent = 'Traduction indisponible pour le moment (limite gratuite atteinte). Réessaie plus tard.'; }
+                    b.disabled = false;
+                };
+                trBox.append(b);
+                renderSyn();
+            };
+            renderSyn();
+
+            body.append(mediaEl,
+                h('div', { class: 'panel' }, h('div', { class: 'd-title', text: item.title }), h('div', { class: 'd-orig', text: item.original && item.original !== item.title ? item.original : '' }), chipsEl, actions),
+                h('div', { class: 'panel' }, h('div', { class: 'syn-title', text: 'RÉSUMÉ' }), synEl, note, trBox),
+                h('div', { class: 'panel' }, h('div', { class: 'syn-title', text: 'OÙ REGARDER' }), watchBox),
+                epsPanel, castPanel, recPanel);
+            const swapMedia = n => { if (token !== detailToken) return; body.replaceChild(n, mediaEl); mediaEl = n; };
+            const addRecs = items => {
+                if (token !== detailToken || !items.length) return;
+                const strip = h('div', { class: 'strip', style: 'padding:0' });
+                items.forEach(i => strip.append(cardEl(i, true)));
+                recPanel.append(strip); recPanel.style.display = 'block';
+            };
+
+            try {
+                // ---------- TMDB ----------
+                if (item.src === 'tmdb') {
+                    const m = item.media;
+                    const d = await tmdb('/' + m + '/' + item.id, { append_to_response: 'videos,credits,recommendations,watch/providers', include_video_language: 'fr,en,ko,ja,null' });
+                    if (token !== detailToken) return;
+                    let txt = d.overview || '', lang = 'fr';
+                    if (!txt) { try { const en = await tmdb('/' + m + '/' + item.id, {}, 'en-US'); txt = en.overview || ''; lang = 'en'; } catch (e) {} }
+                    ctx.text = txt; ctx.lang = lang;
+                    const date = d.release_date || d.first_air_date || '';
+                    setChips([d.vote_average ? '★ ' + d.vote_average.toFixed(1) : '', item.chips && item.chips[0], date.slice(0, 4), d.runtime ? d.runtime + ' min' : '',
+                        m === 'tv' && d.number_of_seasons ? d.number_of_seasons + ' saison(s) · ' + d.number_of_episodes + ' ép.' : ''].concat((d.genres || []).slice(0, 3).map(g => g.name)));
+                    setupTr();
+                    const vids = ((d.videos && d.videos.results) || []).filter(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser'));
+                    vids.sort((a, b) => ((b.iso_639_1 === 'fr') - (a.iso_639_1 === 'fr')) || ((b.type === 'Trailer') - (a.type === 'Trailer')));
+                    const tk = vids[0] ? vids[0].key : '';
+                    swapMedia(trailerNode(tk, d.backdrop_path ? IMG + 'w780' + d.backdrop_path : item.backdrop));
+                    if (tk) actions.append(h('a', { class: 'btn', href: 'https://www.youtube.com/watch?v=' + encodeURIComponent(tk), target: '_blank', rel: 'noopener noreferrer', text: '▶ Bande-annonce YouTube' }));
+                    watchBox.append(providersNode(d['watch/providers'] && d['watch/providers'].results, settings.region), iaLookup(item));
+                    if (m === 'tv') {
+                        const seasons = (d.seasons || []).filter(s => s.season_number > 0);
+                        epsPanel.style.display = 'block';
+                        episodesTmdb(item, seasons, epsPanel);
+                    }
+                    const cast = ((d.credits && d.credits.cast) || []).slice(0, 14);
+                    if (cast.length) {
+                        const row = h('div', { class: 'cast' });
+                        cast.forEach(c => row.append(h('figure', null,
+                            h('img', { src: c.profile_path ? IMG + 'w185' + c.profile_path : placeholder(c.name), alt: c.name, loading: 'lazy' }),
+                            h('figcaption', null, c.name, h('small', { text: c.character || '' })))));
+                        castPanel.append(row); castPanel.style.display = 'block';
+                    }
+                    const gm = await getGenres(m).catch(() => ({}));
+                    addRecs(((d.recommendations && d.recommendations.results) || []).filter(r => r.poster_path).slice(0, 14).map(r => tmdbToItem(r, m, item.chips && item.chips[0] || (m === 'movie' ? 'Film' : 'Série'), gm)));
+                    return;
+                }
+                // ---------- JIKAN ----------
+                if (item.src === 'jikan') {
+                    const f = (await getJSON(JIKAN + '/anime/' + item.id + '/full')).data || {};
+                    if (token !== detailToken) return;
+                    ctx.text = cleanSynopsis(f.synopsis) || ctx.text; ctx.lang = 'en';
+                    const ji = jikanToItem(f);
+                    setChips([f.score ? '★ ' + f.score.toFixed(1) : ''].concat(ji.chips, f.year ? [String(f.year)] : []));
+                    setupTr();
+                    swapMedia(trailerNode(f.trailer && f.trailer.youtube_id, ji.backdrop));
+                    if (f.trailer && f.trailer.youtube_id) actions.append(h('a', { class: 'btn', href: 'https://www.youtube.com/watch?v=' + encodeURIComponent(f.trailer.youtube_id), target: '_blank', rel: 'noopener noreferrer', text: '▶ Bande-annonce YouTube' }));
+                    if (f.url) actions.append(h('a', { class: 'btn', href: f.url, target: '_blank', rel: 'noopener noreferrer', text: '📄 MyAnimeList' }));
+                    const stream = h('div');
+                    if ((f.streaming || []).length) {
+                        const chips = h('div', { class: 'chips', style: 'margin-top:0' });
+                        f.streaming.forEach(s => chips.append(h('a', { class: 'chip', href: s.url, target: '_blank', rel: 'noopener noreferrer', text: s.name })));
+                        stream.append(h('div', { class: 'note', style: 'margin:0 0 8px', text: 'Plateformes légales référencées :' }), chips);
+                    } else stream.append(h('div', { class: 'note', text: 'Aucune plateforme référencée. Ajoute une clé TMDB pour voir les offres en français selon ton pays.' }));
+                    watchBox.append(stream, iaLookup(item));
+                    epsPanel.style.display = 'block';
+                    await sleep(400);
+                    if (token !== detailToken) return;
+                    episodesJikan(item, epsPanel, token);
+                    await sleep(700);
+                    if (token !== detailToken) return;
+                    try {
+                        const r = await getJSON(JIKAN + '/anime/' + item.id + '/recommendations');
+                        addRecs((r.data || []).slice(0, 14).filter(x => x.entry && x.entry.images).map(x => {
+                            const e = x.entry, jpg = e.images.jpg || {};
+                            return { src: 'jikan', id: e.mal_id, title: e.title, original: '', img: jpg.large_image_url || jpg.image_url || '', year: '', score: 0, chips: ['Anime'], url: e.url };
+                        }));
+                    } catch (e) {}
+                    return;
+                }
+                // ---------- INTERNET ARCHIVE ----------
+                const meta = await getJSON(IA + '/metadata/' + encodeURIComponent(item.id));
+                if (token !== detailToken) return;
+                const md = meta.metadata || {};
+                let desc = Array.isArray(md.description) ? md.description.join('\n') : (md.description || '');
+                try { desc = new DOMParser().parseFromString(desc, 'text/html').body.textContent || ''; } catch (e) {}
+                ctx.text = desc.trim().slice(0, 1800); ctx.lang = 'fr'; renderSyn();
+                const lng = Array.isArray(md.language) ? md.language[0] : md.language;
+                setChips(['Domaine public', item.year, md.creator ? String(Array.isArray(md.creator) ? md.creator[0] : md.creator).slice(0, 40) : '', lng || ''].filter(Boolean));
+                const files = iaPickFiles(meta.files);
+                const mediaNode = h('div', { class: 'trailer-wrap', style: 'background-image:url("' + item.img + '")' }, h('div', { class: 'no-trailer', style: 'background:rgba(0,0,0,0.45)' },
+                    files.length ? h('button', { class: 'big-play', type: 'button', 'aria-label': 'Regarder en entier', text: '▶', onclick: () => playVideo(iaUrl(item.id, files[0].name), item.title + (files.length > 1 ? ' — ' + files[0].name : ''), item, files[0].name) }) : 'Aucun fichier vidéo lisible pour ce titre.'));
+                swapMedia(mediaNode);
+                const col = h('div', { class: 'btn-col' });
+                if (!files.length) col.append(h('div', { class: 'note', text: 'Aucun fichier vidéo lisible directement. Ouvre la page sur l\'Internet Archive.' }));
+                else if (files.length === 1) col.append(h('button', { class: 'btn red', type: 'button', text: '▶ Regarder le film en entier', onclick: () => playVideo(iaUrl(item.id, files[0].name), item.title, item, files[0].name) }));
+                else files.forEach((f, i) => col.append(h('button', { class: 'btn red', type: 'button', text: '▶ ' + (i + 1) + '. ' + f.name.replace(/\.[^.]+$/, ''), onclick: () => playVideo(iaUrl(item.id, f.name), item.title + ' — ' + f.name, item, f.name) })));
+                col.append(h('a', { class: 'btn', href: IA + '/details/' + encodeURIComponent(item.id), target: '_blank', rel: 'noopener noreferrer', text: '↗ Page Internet Archive' }));
+                watchBox.append(h('div', { class: 'note', style: 'margin:0', text: 'Film du domaine public ou en licence libre : lecture intégrale, sans publicité.' }), col);
+            } catch (e) {
+                if (token !== detailToken) return;
+                if (e.code === 401) { openSettings('Clé refusée par TMDB. Vérifie-la et réessaie.'); return; }
+                swapMedia(trailerNode('', item.backdrop || item.img));
+                if (!watchBox.children.length) watchBox.append(h('div', { class: 'note', text: 'Impossible de charger les détails (connexion ou limite de l\'API).' }));
+                renderSyn();
+            }
+        }
+        function hideDetail() {
+            detailToken++;
+            $('d-body').innerHTML = '';
+            $('detail').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        $('d-close').addEventListener('click', () => { if (history.state && history.state.o) history.back(); else hideDetail(); });
+
+        // ============ LECTEUR ============
+        const vid = $('vid');
+        let cur = null, hlsInst = null, lastSave = 0;
+
+        function pMsg(t) { const m = $('p-msg'); m.style.display = t ? 'block' : 'none'; m.textContent = t || ''; }
+        function loadHls(url) {
+            if (vid.canPlayType('application/vnd.apple.mpegurl')) { vid.src = url; return; }
+            const start = () => { if (window.Hls && window.Hls.isSupported()) { hlsInst = new window.Hls(); hlsInst.loadSource(url); hlsInst.attachMedia(vid); } else pMsg('Format .m3u8 non pris en charge sur cet appareil.'); };
+            if (window.Hls) return start();
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js';
+            s.onload = start; s.onerror = () => pMsg('Impossible de charger le lecteur HLS.');
+            document.head.append(s);
+        }
+        function playVideo(url, title, item, file) {
+            pMsg('');
+            cur = item ? { item: item, file: file || '' } : null;
+            $('p-title').textContent = title;
+            if (!overlayOpen('player')) openOverlayState('player');
+            $('player').classList.add('open');
+            vid.playbackRate = parseFloat($('p-speed').value) || 1;
+            const entry = item && hist.find(x => x.key === ik(item));
+            vid.onloadedmetadata = () => {
+                if (entry && entry.file === (file || '') && entry.pos > 10 && entry.dur && entry.pos < vid.duration - 30) { vid.currentTime = entry.pos; toast('Reprise là où tu t\'étais arrêté'); }
+                vid.playbackRate = parseFloat($('p-speed').value) || 1;
+            };
+            if (/\.m3u8(\?|$)/i.test(url)) loadHls(url); else vid.src = url;
+            vid.play().catch(() => {});
+            if ('mediaSession' in navigator && window.MediaMetadata) {
+                try { navigator.mediaSession.metadata = new MediaMetadata({ title: title, artist: 'JORVIE MOVIE', artwork: item && item.img ? [{ src: item.img }] : [] }); } catch (e) {}
+            }
+        }
+        function saveProgress(force) {
+            if (!cur || !cur.item || !vid.duration || !isFinite(vid.duration)) return;
+            const now = Date.now();
+            if (!force && now - lastSave < 5000) return;
+            lastSave = now;
+            const k = ik(cur.item);
+            let e = hist.find(x => x.key === k);
+            if (!e) { pushHist(cur.item); e = hist.find(x => x.key === k); }
+            e.pos = vid.currentTime; e.dur = vid.duration; e.file = cur.file || ''; e.t = now;
+            LS.set('jm_hist', hist);
+        }
+        vid.addEventListener('timeupdate', () => saveProgress(false));
+        vid.addEventListener('pause', () => saveProgress(true));
+        vid.addEventListener('error', () => pMsg('Lecture impossible : fichier indisponible ou format non pris en charge.'));
+        window.addEventListener('pagehide', () => saveProgress(true));
+        $('p-speed').addEventListener('change', () => { vid.playbackRate = parseFloat($('p-speed').value) || 1; });
+        if (document.pictureInPictureEnabled) {
+            $('p-pip').style.display = '';
+            $('p-pip').addEventListener('click', () => { (document.pictureInPictureElement ? document.exitPictureInPicture() : vid.requestPictureInPicture()).catch(() => {}); });
+        }
+        function hidePlayer() {
+            saveProgress(true);
+            vid.pause(); vid.removeAttribute('src'); vid.load();
+            if (hlsInst) { hlsInst.destroy(); hlsInst = null; }
+            if (cur && cur.blob) { try { URL.revokeObjectURL(cur.blob); } catch (e) {} }
+            cur = null; pMsg('');
+            $('player').classList.remove('open');
+        }
+        $('p-close').addEventListener('click', () => { if (history.state && history.state.o) history.back(); else hidePlayer(); });
+
+        // ============ RÉGLAGES ============
+        function openSettings(msg) {
+            const err = $('key-error');
+            err.style.display = msg ? 'block' : 'none'; err.textContent = msg || '';
+            $('key-input').value = getKey() === TMDB_KEY ? '' : settings.key;
+            $('region-select').value = settings.region;
+            $('anime-src').value = settings.animeSrc;
+            if (!overlayOpen('settings')) openOverlayState('settings');
+            $('settings').style.display = 'flex';
+        }
+        function hideSettings() { $('settings').style.display = 'none'; }
+        const closeSettings = () => { if (history.state && history.state.o) history.back(); else hideSettings(); };
+        REGIONS.forEach(r => $('region-select').append(h('option', { value: r[0], text: r[1] })));
+        $('settings-btn').addEventListener('click', () => openSettings());
+        $('set-cancel').addEventListener('click', closeSettings);
+        $('set-save').addEventListener('click', () => {
+            const oldKey = settings.key;
+            settings.key = $('key-input').value.trim();
+            settings.region = $('region-select').value;
+            settings.animeSrc = $('anime-src').value;
+            LS.set('jm_set', settings);
+            try { localStorage.removeItem('tmdb_key'); } catch (e) {}
+            closeSettings();
+            toast('Réglages enregistrés');
+            buildControls();
+            if (settings.key !== oldKey || true) startLoad();
+        });
+        $('pick-file').addEventListener('click', () => $('file-input').click());
+        $('file-input').addEventListener('change', e => {
+            const f = e.target.files && e.target.files[0];
+            if (!f) return;
+            const url = URL.createObjectURL(f);
+            closeSettings();
+            setTimeout(() => { playVideo(url, f.name.replace(/\.[^.]+$/, ''), null); cur = { blob: url }; }, 60);
+            e.target.value = '';
+        });
+        $('open-url').addEventListener('click', () => {
+            const u = $('url-input').value.trim();
+            if (!/^https?:\/\//i.test(u)) { toast('Entre un lien http(s) valide'); return; }
+            closeSettings();
+            setTimeout(() => playVideo(u, u.split('/').pop().split('?')[0] || 'Vidéo', null), 60);
+        });
+        $('clr-hist').addEventListener('click', () => { hist = []; LS.set('jm_hist', hist); toast('Historique effacé'); if (state.tab === 'list') startLoad(); });
+        $('clr-fav').addEventListener('click', () => { favs = []; LS.set('jm_fav', favs); toast('Ma liste vidée'); if (state.tab === 'list') startLoad(); });
+
+        // ============ HISTORIQUE NAVIGATEUR (bouton retour) + CLAVIER ============
+        window.addEventListener('popstate', () => {
+            if (overlayOpen('player')) hidePlayer();
+            else if (overlayOpen('settings')) hideSettings();
+            else if (overlayOpen('detail')) hideDetail();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape') return;
+            if (overlayOpen('player')) $('p-close').click();
+            else if (overlayOpen('settings')) closeSettings();
+            else if (overlayOpen('detail')) $('d-close').click();
+        });
+
+        // ============ PWA ============
+        let installEvt = null;
+        window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('install-btn').style.display = 'inline-block'; });
+        $('install-btn').addEventListener('click', async () => {
+            if (!installEvt) return;
+            installEvt.prompt();
+            try { await installEvt.userChoice; } catch (e) {}
+            installEvt = null; $('install-btn').style.display = 'none';
+        });
+        window.addEventListener('appinstalled', () => { $('install-btn').style.display = 'none'; toast('Application installée'); });
+        if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+
         // ============ DÉMARRAGE ============
+        fillRecents();
+        buildControls();
         window.addEventListener('load', startLoad);
+    })();
     </script>
 </body>
 </html>
