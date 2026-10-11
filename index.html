@@ -214,6 +214,10 @@
         .key-card .btn { flex: 1; text-align: center; min-width: 120px; }
         #key-error { color: #ff7b85; font-size: 12px; margin-bottom: 8px; display: none; }
 
+        #links-list p { margin: 0; }
+        .link-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .link-play { flex: 1; min-width: 0; text-align: left; padding: 9px 14px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); }
+        .link-del { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; background: rgba(255, 42, 57, 0.85); border: 1px solid rgba(255,255,255,0.25); }
         #toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); z-index: 3000; opacity: 0; pointer-events: none; transition: .25s; background: rgba(30,30,40,0.96); border: 1px solid rgba(255,255,255,0.2); padding: 10px 18px; border-radius: 22px; font-size: 13px; max-width: 90vw; text-align: center; }
         #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -296,11 +300,14 @@
             <div class="row2"><button class="btn red" id="set-save" type="button">Enregistrer</button><button class="btn" id="set-cancel" type="button">Annuler</button></div>
 
             <h4>MA BIBLIOTHÈQUE</h4>
-            <p>Lis une vidéo de ton appareil ou un lien direct (.mp4, .webm, .m3u8) — uniquement des contenus dont tu détiens les droits.</p>
+            <p>Lis une vidéo de ton appareil, ou enregistre des liens directs vers des fichiers vidéo (.mp4, .webm, .m3u8) : ils se lisent dans le lecteur de l'application, sans redirection. Uniquement des contenus dont tu détiens les droits.</p>
             <div class="row2"><button class="btn" id="pick-file" type="button">📁 Fichier de mon appareil</button></div>
             <input type="file" id="file-input" accept="video/*" hidden>
-            <input type="url" id="url-input" placeholder="https://…/video.mp4" autocomplete="off" aria-label="Lien vidéo direct" style="margin-top:10px">
-            <div class="row2"><button class="btn" id="open-url" type="button">▶ Ouvrir le lien</button></div>
+            <input type="text" id="link-title" placeholder="Titre (optionnel)" autocomplete="off" aria-label="Titre du lien" style="margin-top:10px">
+            <input type="url" id="url-input" placeholder="https://…/video.mp4" autocomplete="off" aria-label="Lien vidéo direct">
+            <div class="row2"><button class="btn" id="open-url" type="button">▶ Lire</button><button class="btn red" id="save-link" type="button">＋ Enregistrer</button></div>
+            <h4>MES LIENS</h4>
+            <div id="links-list"></div>
 
             <h4>DONNÉES</h4>
             <div class="row2"><button class="btn" id="clr-hist" type="button">Effacer l'historique</button><button class="btn" id="clr-fav" type="button">Vider ma liste</button></div>
@@ -332,7 +339,7 @@
             list: { kind: 'list' }
         };
         const SORTS = [['pop', 'Populaires'], ['top', 'Mieux notés'], ['new', 'Récents']];
-        const LIST_SORTS = [['fav', '❤ Ma liste'], ['hist', '🕘 Historique'], ['cont', '▶ À reprendre']];
+        const LIST_SORTS = [['fav', '❤ Ma liste'], ['links', '🔗 Mes liens'], ['hist', '🕘 Historique'], ['cont', '▶ À reprendre']];
         const GENRES = {
             jikan: [['', 'Tous les genres'], ['1', 'Action'], ['2', 'Aventure'], ['4', 'Comédie'], ['8', 'Drame'], ['10', 'Fantasy'], ['14', 'Horreur'], ['7', 'Mystère'], ['22', 'Romance'], ['24', 'Science-fiction'], ['36', 'Tranche de vie'], ['37', 'Surnaturel'], ['30', 'Sport']],
             movie: [['', 'Tous les genres'], ['28', 'Action'], ['35', 'Comédie'], ['18', 'Drame'], ['27', 'Horreur'], ['10749', 'Romance'], ['53', 'Thriller'], ['80', 'Crime'], ['14', 'Fantastique'], ['878', 'Science-fiction'], ['16', 'Animation']],
@@ -391,6 +398,7 @@
         const settings = Object.assign({ key: '', region: 'FR', animeSrc: 'auto' }, LS.get('jm_set', {}));
         try { const old = localStorage.getItem('tmdb_key'); if (old && !settings.key) settings.key = old; } catch (e) {}
         let favs = LS.get('jm_fav', []);
+        let links = LS.get('jm_links', []);
         let hist = LS.get('jm_hist', []);
         let seen = LS.get('jm_seen', {});
         let trCache = LS.get('jm_tr', {});
@@ -693,8 +701,9 @@
                 h('div', { class: 'card-info' },
                     h('div', { class: 'card-title', text: item.title }),
                     h('div', { class: 'card-sub', text: [item.year, item.chips && item.chips[0]].filter(Boolean).join(' • ') })));
-            c.onclick = () => openDetail(item);
-            c.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(item); } };
+            const open = () => { if (item.src === 'link') playVideo(item.url, item.title, null); else openDetail(item); };
+            c.onclick = open;
+            c.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } };
             return c;
         }
         function appendCards() {
@@ -750,12 +759,15 @@
 
         function renderList() {
             prepareGrid();
-            let arr = state.sort === 'hist' ? hist.map(x => x.item) : state.sort === 'cont' ? hist.filter(resumable).map(x => x.item) : favs;
+            let arr = state.sort === 'hist' ? hist.map(x => x.item)
+                : state.sort === 'cont' ? hist.filter(resumable).map(x => x.item)
+                : state.sort === 'links' ? links.map(l => ({ src: 'link', id: l.id, title: l.title, original: '', img: '', year: '', score: 0, chips: ['Mon lien'], url: l.url }))
+                : favs;
             const q = state.query.toLowerCase();
             if (q) arr = arr.filter(i => i.title.toLowerCase().indexOf(q) > -1);
             state.items = arr;
             appendCards();
-            if (!arr.length) updateFooter(state.sort === 'fav' ? 'Ta liste est vide. Appuie sur « Ajouter à ma liste » dans une fiche.' : 'Rien ici pour le moment.');
+            if (!arr.length) updateFooter(state.sort === 'fav' ? 'Ta liste est vide. Appuie sur « Ajouter à ma liste » dans une fiche.' : state.sort === 'links' ? 'Aucun lien enregistré. Ajoute-en dans ⚙ Réglages → Ma bibliothèque.' : 'Rien ici pour le moment.');
         }
 
         async function searchAll() {
@@ -1232,7 +1244,7 @@
         }
         vid.addEventListener('timeupdate', () => saveProgress(false));
         vid.addEventListener('pause', () => saveProgress(true));
-        vid.addEventListener('error', () => pMsg('Lecture impossible : fichier indisponible ou format non pris en charge.'));
+        vid.addEventListener('error', () => pMsg('Lecture impossible. Le lien doit pointer directement vers un fichier vidéo (.mp4, .webm, .m3u8), pas vers une page web.'));
         window.addEventListener('pagehide', () => saveProgress(true));
         $('p-speed').addEventListener('change', () => { vid.playbackRate = parseFloat($('p-speed').value) || 1; });
         if (document.pictureInPictureEnabled) {
@@ -1256,6 +1268,7 @@
             $('key-input').value = getKey() === TMDB_KEY ? '' : settings.key;
             $('region-select').value = settings.region;
             $('anime-src').value = settings.animeSrc;
+            renderLinks();
             if (!overlayOpen('settings')) openOverlayState('settings');
             $('settings').style.display = 'flex';
         }
@@ -1285,11 +1298,37 @@
             setTimeout(() => { playVideo(url, f.name.replace(/\.[^.]+$/, ''), null); cur = { blob: url }; }, 60);
             e.target.value = '';
         });
-        $('open-url').addEventListener('click', () => {
+        function readLinkForm() {
             const u = $('url-input').value.trim();
-            if (!/^https?:\/\//i.test(u)) { toast('Entre un lien http(s) valide'); return; }
+            if (!/^https?:\/\//i.test(u)) { toast('Entre un lien http(s) valide'); return null; }
+            return { title: $('link-title').value.trim() || u.split('/').pop().split('?')[0] || 'Vidéo', url: u };
+        }
+        function renderLinks() {
+            const box = $('links-list');
+            box.innerHTML = '';
+            if (!links.length) { box.append(h('p', { class: 'note', text: 'Aucun lien enregistré.' })); return; }
+            links.forEach(l => box.append(h('div', { class: 'link-row' },
+                h('button', { class: 'link-play', type: 'button', text: '▶ ' + l.title, onclick: () => { closeSettings(); setTimeout(() => playVideo(l.url, l.title, null), 60); } }),
+                h('button', { class: 'link-del', type: 'button', 'aria-label': 'Supprimer ' + l.title, text: '✕', onclick: () => {
+                    links = links.filter(x => x.id !== l.id); LS.set('jm_links', links); renderLinks();
+                    if (state.tab === 'list' && state.sort === 'links') renderList();
+                } }))));
+        }
+        $('open-url').addEventListener('click', () => {
+            const l = readLinkForm();
+            if (!l) return;
             closeSettings();
-            setTimeout(() => playVideo(u, u.split('/').pop().split('?')[0] || 'Vidéo', null), 60);
+            setTimeout(() => playVideo(l.url, l.title, null), 60);
+        });
+        $('save-link').addEventListener('click', () => {
+            const l = readLinkForm();
+            if (!l) return;
+            links.unshift({ id: String(Date.now()), title: l.title, url: l.url });
+            LS.set('jm_links', links);
+            $('link-title').value = ''; $('url-input').value = '';
+            renderLinks();
+            toast('Lien enregistré dans Mes liens');
+            if (state.tab === 'list' && state.sort === 'links') renderList();
         });
         $('clr-hist').addEventListener('click', () => { hist = []; LS.set('jm_hist', hist); toast('Historique effacé'); if (state.tab === 'list') startLoad(); });
         $('clr-fav').addEventListener('click', () => { favs = []; LS.set('jm_fav', favs); toast('Ma liste vidée'); if (state.tab === 'list') startLoad(); });
